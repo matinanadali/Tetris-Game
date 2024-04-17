@@ -8,7 +8,7 @@
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 
 #include "state.h"
-
+#define INF 999999999
 
 ///// Βοηθητικές συναρτήσεις ////////////////////////////////////////
 //
@@ -36,7 +36,37 @@ void test_state_create() {
 	TEST_ASSERT(!info->paused);
 	TEST_ASSERT(info->score == 0);
 
-	// Προσθέστε επιπλέον ελέγχους
+	
+	TEST_ASSERT(info->spaceship->type == SPACESHIP);
+	//έλεγχος θέσης διαστημόπλοιου
+	TEST_ASSERT(info->spaceship->position.x == 0 && info->spaceship->position.y == 0);
+
+	//έλεγχος συνολικού αριθμού αστεροειδών - στην αρχική κατάσταση δεν υπάρχουν σφαίρες
+	List initial_state_objects = state_objects(state, (Vector2){-INF, INF}, (Vector2){INF, -INF});
+	TEST_ASSERT(list_size(initial_state_objects) == ASTEROID_NUM);
+	
+	//έλεγχος αριθμού αστεροειδών σε ορισμένο ορθογώνιο
+	Vector2 top_left = {-2000, 9000};
+	Vector2 bottom_right = {8000, -300};
+	
+	List limited_state_objects = state_objects(state, top_left, bottom_right);
+
+	int number_of_asteroids_in_rectangle = 0;
+	
+	for (ListNode node = list_first(initial_state_objects); 
+		node != LIST_EOF; 
+		node = list_next(initial_state_objects, node)
+		) {
+		
+		Vector2 position = *(Vector2*)list_node_value(initial_state_objects, node);
+		if (top_left.x <= position.x &&
+			top_left.y >= position.y &&
+			bottom_right.x >= position.x &&
+			bottom_right.y <= position.y)
+		
+			number_of_asteroids_in_rectangle++;
+	}
+	TEST_ASSERT(list_size(limited_state_objects) == number_of_asteroids_in_rectangle);
 }
 
 void test_state_update() {

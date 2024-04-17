@@ -109,17 +109,28 @@ State state_create() {
 // Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
 
 StateInfo state_info(State state) {
-	// Προς υλοποίηση
-	return NULL;
+	return &state->info;
 }
 
 // Επιστρέφει μια λίστα με όλα τα αντικείμενα του παιχνιδιού στην κατάσταση state,
 // των οποίων η θέση position βρίσκεται εντός του παραλληλογράμμου με πάνω αριστερή
 // γωνία top_left και κάτω δεξιά bottom_right.
+bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_right) {
+	return position.x >= top_left.x && 
+		   position.x <= bottom_right.x &&
+		   position.y <= top_left.y &&
+		   position.y >= bottom_right.y;
+}
 
 List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 	// Προς υλοποίηση
-	return NULL;
+	List object_list = list_create(NULL);
+	for (int i = 0; i < vector_size(state->objects); i++) {
+		Object current_object = vector_get_at(state->objects, i);
+		if (is_inside_rectangle(current_object->position, top_left, bottom_right)) 
+			list_insert_next(object_list, list_last(object_list), current_object);
+	}
+	return object_list;
 }
 
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.

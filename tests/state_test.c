@@ -8,6 +8,7 @@
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
 
 #include "state.h"
+#include "vec2.h"
 #define INF 999999999
 
 ///// Βοηθητικές συναρτήσεις ////////////////////////////////////////
@@ -89,7 +90,30 @@ void test_state_update() {
 	TEST_ASSERT( vec2_equal( state_info(state)->spaceship->position, (Vector2){0,0}) );
 	TEST_ASSERT( vec2_equal( state_info(state)->spaceship->speed,    (Vector2){0,SPACESHIP_ACCELERATION}) );
 
-	// Προσθέστε επιπλέον ελέγχους
+	// Αν το πάνω βέλος δεν είναι πατημένο, το διαστημόπλοιο επιβραδύνεται
+	//η ταχύτητά του δεν πρέπει να είναι ποτέ αρνητική
+	keys.up = false;
+	state_update(state, &keys);
+	if (SPACESHIP_ACCELERATION-SPACESHIP_SLOWDOWN >= 0) {
+		TEST_ASSERT( vec2_equal( state_info(state)->spaceship->speed, (Vector2){0,SPACESHIP_ACCELERATION-SPACESHIP_SLOWDOWN}) );
+	} else {
+		TEST_ASSERT( vec2_equal( state_info(state)->spaceship->speed, (Vector2){0,0}) );
+	}
+
+	// Με πατημένο το αριστερό βέλος, το διαστημόπλοιο περιστρέφεται κατά SPACESHIP_ROTATION αριστερόστροφα
+	Vector2 initial_orientation = state_info(state)->spaceship->orientation;
+	keys.left = true;
+	state_update(state, &keys);
+
+	TEST_ASSERT( vec2_equal( state_info(state)->spaceship->orientation, vec2_rotate(initial_orientation, SPACESHIP_ROTATION)) );
+
+	keys.left = false;
+
+	// Έλεγχος λειτουργίας pause
+	keys.p = true;
+	state_update(state, &keys);
+
+	TEST_ASSERT( state_info(state)->paused );
 }
 
 

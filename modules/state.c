@@ -112,9 +112,8 @@ StateInfo state_info(State state) {
 	return &state->info;
 }
 
-// Επιστρέφει μια λίστα με όλα τα αντικείμενα του παιχνιδιού στην κατάσταση state,
-// των οποίων η θέση position βρίσκεται εντός του παραλληλογράμμου με πάνω αριστερή
-// γωνία top_left και κάτω δεξιά bottom_right.
+//ελέγχει αν το σημείο στη θέση position είναι εντός του ορθογωνίου που ορίζουν 
+//τα σημεία top_left και bottom_right
 bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_right) {
 	return position.x >= top_left.x && 
 		   position.x <= bottom_right.x &&
@@ -122,8 +121,10 @@ bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_righ
 		   position.y >= bottom_right.y;
 }
 
+// Επιστρέφει μια λίστα με όλα τα αντικείμενα του παιχνιδιού στην κατάσταση state,
+// των οποίων η θέση position βρίσκεται εντός του παραλληλογράμμου με πάνω αριστερή
+// γωνία top_left και κάτω δεξιά bottom_right.
 List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
-	// Προς υλοποίηση
 	List object_list = list_create(NULL);
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		Object current_object = vector_get_at(state->objects, i);
@@ -133,11 +134,54 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 	return object_list;
 }
 
+//ενημερώνει την κατάσταση του διαστημοπλοίου
+void spaceship_update(Object spaceship, KeyState keys) {
+	//περιστροφή διαστημοπλοίου
+	if (keys->left || keys->right) {
+		double rotation_angle = (keys->left ? 1 : -1) * SPACESHIP_ROTATION;
+		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
+	}
+	
+	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
+		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
+		spaceship->speed = vec2_add(spaceship->speed, acceleration);
+	} else {        //επιβράδυνση διαστημοπλοίου
+		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
+		spaceship->speed = vec2_add(spaceship->speed, slowdown);
+		//το διαστημόπλοιο ακινητοποιείται
+		if (spaceship->speed.x < 0 || spaceship->speed.y < 0) {
+			spaceship->speed = (Vector2){0,0};
+		}
+	}
+}
+
+//ενημερώνει την κατάσταση του αντικειμένου (αστεροειδής-σφαίρα) object
+void object_update(Object object, KeyState keys) {
+	//ενημέρωση θέσης
+	object->position = vec2_add(object->position, object->speed);
+}
+
+//ενημερώνει την κατάσταση του παιχνιδιού - paused / not paused
+void game_update(State state, bool togglePause) {
+	if (togglePause) {
+		state->info.paused = !state->info.paused;
+	} 
+}
+
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
-
 void state_update(State state, KeyState keys) {
-	// Προς υλοποίηση
+	game_update(state, keys->p);
+
+	if (state_info(state)->paused) return;
+
+	for (int i = 0; i < vector_size(state->objects); i++) {
+		Object current_object = vector_get_at(state->objects, i);
+		object_update(current_object, keys);
+	}
+	spaceship_update(state_info(state)->spaceship, keys);
+
+	game_update(state, state->info.paused && keys->n);
 }
 
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη.

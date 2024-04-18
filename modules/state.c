@@ -168,6 +168,34 @@ void game_update(State state, bool togglePause) {
 	} 
 }
 
+bool is_near_spaceship(Object object, Vector2 spaceship_position) {
+	return vec2_distance(object->position, spaceship_position) < ASTEROID_MAX_DIST;
+}
+
+void num_asteroids_update(State state) {
+	int asteroids_near_spaceship = 0;
+	for (int i = 0; i < vector_size(state->objects); i++) {
+		Object current_object = vector_get_at(state->objects, i);
+		if (current_object->type != ASTEROID) continue;
+		if (is_near_spaceship(current_object, state->info.spaceship->position)) {
+			asteroids_near_spaceship++;
+		}
+	}
+
+	add_asteroids(state, ASTEROID_NUM - asteroids_near_spaceship);
+}
+
+void add_bullet(State state) {
+	if (state->next_bullet > 0) return;
+	Object spaceship = state->info.spaceship;
+	Vector2 speed = vec2_add(spaceship->speed, vec2_scale(spaceship->orientation, BULLET_SPEED));
+	Vector2 position = spaceship->position;
+
+	vector_insert_last(state->objects, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
+	state->next_bullet = BULLET_DELAY;
+}
+
+
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys) {
@@ -181,6 +209,14 @@ void state_update(State state, KeyState keys) {
 	}
 	spaceship_update(state_info(state)->spaceship, keys);
 
+	num_asteroids_update(state);
+	
+	if (keys->space) {
+		add_bullet(state);
+	}
+	state->next_bullet--;
+
+	handle_collapses(state);
 	game_update(state, state->info.paused && keys->n);
 }
 

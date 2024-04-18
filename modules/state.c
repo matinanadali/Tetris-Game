@@ -195,6 +195,51 @@ void add_bullet(State state) {
 	state->next_bullet = BULLET_DELAY;
 }
 
+bool is_visible(Object object) {
+	Vector2 top_left = {-getScreenWidth() / 2, getScreenHeight() / 2};
+	Vector2 bottom_right = {getScreenWidth() / 2, -getScreenheight() / 2};
+	return is_inside_rectangle(object->position, top_left, bottom_right);
+}
+
+
+List get_visible_objects(Vector objects, ObjectType type) {
+	List visible_objects = create_list();
+	for (int i = 0; i < vector_size(objects); i++) {
+		Object current_object = vector_get_at(objects, i);
+		if (current_object->type == type && is_visible(current_object)) {
+			list_append(visible_objects, list_last(visible_objects), current_object);
+		}
+	}
+	return visible_objects;
+}
+
+void handle_collapses(State state) {
+	List asteroids = get_visible_objects(state->objects, ASTEROID);
+	List bullets = get_visible_objects(state->objects, BULLET);
+
+	for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
+		Object asteroid = list_node_value(asteroids, a);
+		if (collapse(state->info.spaceship, asteroid)) {
+			asteroid->size = 0;
+		}
+	}
+
+	for (ListNode b = list_first(bullets); b != LIST_EOF; b = list_next(bullets, b)) {
+		Object bullet = list_get_at(bullets, b);
+		for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
+			Object asteroid = list_node_value(asteroids, a);
+			if (collapse(bullet, asteroid)) {
+				int asteroid_size = asteroid->size;
+				asteroid->size = 0;
+				
+				
+			}
+		}
+	}
+	list_destroy(asteroids);
+	list_destroy(bullets);
+}
+
 
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.

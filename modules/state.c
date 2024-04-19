@@ -213,6 +213,11 @@ List get_visible_objects(Vector objects, ObjectType type) {
 	return visible_objects;
 }
 
+
+bool collapses(Object a, Object b) {
+	return CheckCollisionCircles(a->position, a->size / 2, b->position, b->size / 2);
+}
+
 void handle_collapses(State state) {
 	List asteroids = get_visible_objects(state->objects, ASTEROID);
 	List bullets = get_visible_objects(state->objects, BULLET);
@@ -229,10 +234,41 @@ void handle_collapses(State state) {
 		for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
 			Object asteroid = list_node_value(asteroids, a);
 			if (collapse(bullet, asteroid)) {
-				int asteroid_size = asteroid->size;
+				int new_asteroid_size = asteroid->size / 2;
+				Vector2 speed = vec2_from_polar(
+					1.5 * vec_distance(asteroid->speed, (Vector2){0,0}),
+					randf(0, 2*PI)
+				);
 				asteroid->size = 0;
-				
-				
+
+				if (new_asteroid_size < ASTEROID_MIN_SIZE) continue;
+
+				Vector2 position = vec2_add(
+					state->info.spaceship->position,
+					vec2_from_polar(
+						randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
+						randf(0, 2*PI)									// κατεύθυνση
+					)
+				);
+				Object new_asteroid = create_object(ASTEROID, position, speed, (Vector2){0,0}, new_asteroid_size);
+				vector_insert_last(state->objects, new_asteroid);
+				Vector2 speed = vec2_from_polar(
+					1.5 * vec_distance(asteroid->speed, (Vector2){0,0}),
+					randf(0, 2*PI)
+				);
+				asteroid->size = 0;
+
+				if (new_asteroid_size < ASTEROID_MIN_SIZE) continue;
+
+				Vector2 position = vec2_add(
+					state->info.spaceship->position,
+					vec2_from_polar(
+						randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
+						randf(0, 2*PI)									// κατεύθυνση
+					)
+				);
+				new_asteroid = create_object(ASTEROID, position, speed, (Vector2){0,0}, new_asteroid_size);
+				vector_insert_last(state->objects, new_asteroid);
 			}
 		}
 	}

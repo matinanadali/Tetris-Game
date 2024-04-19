@@ -196,18 +196,18 @@ void add_bullet(State state) {
 }
 
 bool is_visible(Object object) {
-	Vector2 top_left = {-getScreenWidth() / 2, getScreenHeight() / 2};
-	Vector2 bottom_right = {getScreenWidth() / 2, -getScreenheight() / 2};
+	Vector2 top_left = {-GetScreenWidth() / 2, GetScreenHeight() / 2};
+	Vector2 bottom_right = {GetScreenWidth() / 2, -GetScreenHeight() / 2};
 	return is_inside_rectangle(object->position, top_left, bottom_right);
 }
 
 
 List get_visible_objects(Vector objects, ObjectType type) {
-	List visible_objects = create_list();
+	List visible_objects = list_create(NULL);
 	for (int i = 0; i < vector_size(objects); i++) {
 		Object current_object = vector_get_at(objects, i);
 		if (current_object->type == type && is_visible(current_object)) {
-			list_append(visible_objects, list_last(visible_objects), current_object);
+			list_insert_next(visible_objects, list_last(visible_objects), current_object);
 		}
 	}
 	return visible_objects;
@@ -224,19 +224,19 @@ void handle_collapses(State state) {
 
 	for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
 		Object asteroid = list_node_value(asteroids, a);
-		if (collapse(state->info.spaceship, asteroid)) {
+		if (collapses(state->info.spaceship, asteroid)) {
 			asteroid->size = 0;
 		}
 	}
 
 	for (ListNode b = list_first(bullets); b != LIST_EOF; b = list_next(bullets, b)) {
-		Object bullet = list_get_at(bullets, b);
+		Object bullet = list_node_value(bullets, b);
 		for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
 			Object asteroid = list_node_value(asteroids, a);
-			if (collapse(bullet, asteroid)) {
+			if (collapses(bullet, asteroid)) {
 				int new_asteroid_size = asteroid->size / 2;
 				Vector2 speed = vec2_from_polar(
-					1.5 * vec_distance(asteroid->speed, (Vector2){0,0}),
+					1.5 * vec2_distance(asteroid->speed, (Vector2){0,0}),
 					randf(0, 2*PI)
 				);
 				asteroid->size = 0;
@@ -252,15 +252,15 @@ void handle_collapses(State state) {
 				);
 				Object new_asteroid = create_object(ASTEROID, position, speed, (Vector2){0,0}, new_asteroid_size);
 				vector_insert_last(state->objects, new_asteroid);
-				Vector2 speed = vec2_from_polar(
-					1.5 * vec_distance(asteroid->speed, (Vector2){0,0}),
+				speed = vec2_from_polar(
+					1.5 * vec2_distance(asteroid->speed, (Vector2){0,0}),
 					randf(0, 2*PI)
 				);
 				asteroid->size = 0;
 
 				if (new_asteroid_size < ASTEROID_MIN_SIZE) continue;
 
-				Vector2 position = vec2_add(
+				position = vec2_add(
 					state->info.spaceship->position,
 					vec2_from_polar(
 						randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση

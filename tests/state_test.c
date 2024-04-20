@@ -9,7 +9,7 @@
 
 #include "state.h"
 #include "vec2.h"
-#define INF 999999999
+#define INF 9999999999
 
 ///// Βοηθητικές συναρτήσεις ////////////////////////////////////////
 //
@@ -70,7 +70,7 @@ void test_state_create() {
 	TEST_ASSERT(list_size(limited_state_objects) == number_of_asteroids_in_rectangle);
 }
 
-void test_state_update() {
+void test_reaction_to_pressed_keys() {
 	State state = state_create();
 	TEST_ASSERT(state != NULL && state_info(state) != NULL);
 
@@ -115,6 +115,81 @@ void test_state_update() {
 
 	TEST_ASSERT( state_info(state)->paused );
 }
+
+void test_bullet_asteroid_collision() {
+	State state = state_create();
+	TEST_ASSERT(state != NULL && state_info(state) != NULL);
+	
+	//προσθέτουμε μία σφαίρα, θεωρώντας πατημένο το space
+	struct key_state keys = { false, false, false, false, true, false, false };
+	state_update(state, &keys);
+
+	//επιλέγουμε τον αστεροειδή και τη σφαίρα που πρόκειται να συγκρουστούν
+	List objects = state_objects(state, (Vector2){-INF, INF}, (Vector2){INF, -INF});
+	Object asteroid_in_collision = NULL, bullet_in_collision = NULL;
+	for (ListNode node = list_first(objects); node != LIST_EOF; node = list_next(objects, node)) {
+		Object object = list_node_value(objects, node);
+		if (object->type == ASTEROID) {
+			asteroid_in_collision = object;
+		} else {
+			bullet_in_collision = object;
+		}
+	}
+	TEST_ASSERT(asteroid_in_collision != NULL);
+	TEST_ASSERT(bullet_in_collision != NULL);
+	double initial_asteroid_size = asteroid_in_collision->size;
+
+	//μεταβάλλουμε τις θέσεις τους ώστε να συγκρουστούν
+	asteroid_in_collision->position = (Vector2){100, 120};
+	bullet_in_collision->position = (Vector2){100, 110 + bullet_in_collision->size};
+
+	keys = (struct key_state){ false, false, false, false, false, false, false };
+	state_update(state, &keys);
+
+	//ελέγχουμε ότι ο αστεροειδής έχει πλέον μηδενικό μέγεθος
+	TEST_ASSERT(asteroid_in_collision->size == 0);
+	
+	//ελέγχουμε ότι έχουν προστεθεί δύο νέοι αστεροιειδείς μόνο αν το μέγεθος του αρχικού ήταν αρκετά μεγάλο
+	int number_of_asteroids = list_size(state_objects(state, (Vector2){-INF, INF},(Vector2){INF, -INF})) - 1; 
+	TEST_ASSERT((initial_asteroid_size < 2*ASTEROID_MIN_SIZE) ^ (number_of_asteroids >= ASTEROID_NUM + 2));
+
+	//ελέγχουμε αν το σκορ μεταβλήθηκε σωστά
+	if (initial_asteroid_size >= 2*ASTEROID_MIN_SIZE) {
+		//δημιουργήθηκαν 2 νέοι αστεροειδείς (+2) και έγινε μία σύγκρουση σφαίρας-αστεροειδούς (-10)
+		TEST_ASSERT(state_info(state)->score == 2 - 10);
+	} else {
+		//έγινε σύγκρουση σφαίρας-αστεροειδούς (-10)
+		TEST_ASSERT(state_info(state)->score == -10);
+	}
+}
+
+void test_asteroid_spaceship_collision() {
+	State state = state_create();
+	TEST_ASSERT(state != NULL && state_info(state) != NULL);
+	//αρχικοποιούμε το σκορ σε μία τυχαία τιμή
+	state_info(state)->score = 20;
+
+	List objects = state_objects(state, (Vector2){-INF, INF}, (Vector2){INF, -INF});
+	Object asteroid_in_collision = (Object)list_node_value(objects, list_first(objects));
+
+	//μεταβάλλουμε τη θέση του αστεροειδούς ώστε να συμβεί η σύγκρουση
+	asteroid_in_collision->position = (Vector2){0.5 * asteroid_in_collision->size, -0.75 * asteroid_in_collision->size};
+	struct key_state keys = (struct key_state){ false, false, false, false, false, false, false };
+	state_update(state, &keys);
+
+	//ελέγχουμε ότι ο αστεροειδής έχει καταστραφεί
+	TEST_ASSERT(asteroid_in_collision->size == 0);
+	
+	//ελέγχουμε ότι το σκορ έχει μειωθεί στο μισό
+	TEST_ASSERT(state_info(state)->score == 10);
+}
+
+void test_state_update() {
+	test_reaction_to_pressed_keys();
+	test_bullet_asteroid_collision();
+	test_asteroid_spaceship_collision();
+}
+
 
 
 // Λίστα με όλα τα tests προς εκτέλεση

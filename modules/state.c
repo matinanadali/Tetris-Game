@@ -5,7 +5,7 @@
 #include "ADTList.h"
 #include "state.h"
 #include "vec2.h"
-
+#include <stdio.h>
 
 // Οι ολοκληρωμένες πληροφορίες της κατάστασης του παιχνιδιού.
 // Ο τύπος State είναι pointer σε αυτό το struct, αλλά το ίδιο το struct
@@ -156,9 +156,9 @@ void spaceship_update(Object spaceship, KeyState keys) {
 }
 
 //ενημερώνει την κατάσταση του αντικειμένου (αστεροειδής-σφαίρα) object
-void object_update(Object object, KeyState keys) {
+void object_update(Object object, int speed_factor) {
 	//ενημέρωση θέσης
-	object->position = vec2_add(object->position, object->speed);
+	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
 }
 
 //ενημερώνει την κατάσταση του παιχνιδιού - paused / not paused
@@ -206,7 +206,7 @@ List get_visible_objects(Vector objects, ObjectType type) {
 	List visible_objects = list_create(NULL);
 	for (int i = 0; i < vector_size(objects); i++) {
 		Object current_object = vector_get_at(objects, i);
-		if (current_object->type == type && is_visible(current_object)) {
+		if (current_object->type == type) {
 			list_insert_next(visible_objects, list_last(visible_objects), current_object);
 		}
 	}
@@ -218,6 +218,28 @@ bool collapses(Object a, Object b) {
 	return CheckCollisionCircles(a->position, a->size / 2, b->position, b->size / 2);
 }
 
+Object create_new_asteroid(int size, int speed_value, Vector2 spaceship_position) {
+	Vector2 speed = vec2_from_polar(
+		speed_value,
+		randf(0, 2*PI)
+	);
+	Vector2 position = vec2_add(
+		spaceship_position,
+		vec2_from_polar(
+			randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
+			randf(0, 2*PI)									// κατεύθυνση
+		)
+	);
+	Object new_asteroid = create_object(
+		ASTEROID,
+		position,
+		speed,
+		(Vector2){0,0},
+		size
+	);
+	return new_asteroid;
+}
+
 void handle_collapses(State state) {
 	List asteroids = get_visible_objects(state->objects, ASTEROID);
 	List bullets = get_visible_objects(state->objects, BULLET);
@@ -226,6 +248,7 @@ void handle_collapses(State state) {
 		Object asteroid = list_node_value(asteroids, a);
 		if (collapses(state->info.spaceship, asteroid)) {
 			asteroid->size = 0;
+			state->info.score /= 2;
 		}
 	}
 
@@ -234,41 +257,15 @@ void handle_collapses(State state) {
 		for (ListNode a = list_first(asteroids); a != LIST_EOF; a = list_next(asteroids, a)) {
 			Object asteroid = list_node_value(asteroids, a);
 			if (collapses(bullet, asteroid)) {
-				int new_asteroid_size = asteroid->size / 2;
-				Vector2 speed = vec2_from_polar(
-					1.5 * vec2_distance(asteroid->speed, (Vector2){0,0}),
-					randf(0, 2*PI)
-				);
+				state->info.score-=10;
+				double new_asteroid_size = asteroid->size / 2;
 				asteroid->size = 0;
-
 				if (new_asteroid_size < ASTEROID_MIN_SIZE) continue;
-
-				Vector2 position = vec2_add(
-					state->info.spaceship->position,
-					vec2_from_polar(
-						randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
-						randf(0, 2*PI)									// κατεύθυνση
-					)
-				);
-				Object new_asteroid = create_object(ASTEROID, position, speed, (Vector2){0,0}, new_asteroid_size);
-				vector_insert_last(state->objects, new_asteroid);
-				speed = vec2_from_polar(
-					1.5 * vec2_distance(asteroid->speed, (Vector2){0,0}),
-					randf(0, 2*PI)
-				);
-				asteroid->size = 0;
-
-				if (new_asteroid_size < ASTEROID_MIN_SIZE) continue;
-
-				position = vec2_add(
-					state->info.spaceship->position,
-					vec2_from_polar(
-						randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
-						randf(0, 2*PI)									// κατεύθυνση
-					)
-				);
-				new_asteroid = create_object(ASTEROID, position, speed, (Vector2){0,0}, new_asteroid_size);
-				vector_insert_last(state->objects, new_asteroid);
+				
+				double new_asteroid_speed = 1.5 * vec2_distance(asteroid->speed, (Vector2){0,0});
+				vector_insert_last(state->objects, create_new_asteroid(new_asteroid_size, new_asteroid_speed, state->info.spaceship->position));
+				vector_insert_last(state->objects, create_new_asteroid(new_asteroid_size, new_asteroid_speed, state->info.spaceship->position));
+				state->info.score+=2;
 			}
 		}
 	}
@@ -284,11 +281,14 @@ void state_update(State state, KeyState keys) {
 
 	if (state_info(state)->paused) return;
 
+	handle_collapses(state);
+	
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		Object current_object = vector_get_at(state->objects, i);
-		object_update(current_object, keys);
+		object_update(current_object, state->speed_factor);
 	}
 	spaceship_update(state_info(state)->spaceship, keys);
+	
 
 	num_asteroids_update(state);
 	
@@ -297,7 +297,9 @@ void state_update(State state, KeyState keys) {
 	}
 	state->next_bullet--;
 
-	handle_collapses(state);
+	if (state->info.score % 100 == 0) {
+		state->speed_factor *= 1.1;
+	}
 	game_update(state, state->info.paused && keys->n);
 }
 

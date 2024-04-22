@@ -1,7 +1,6 @@
 # paths
 LIB = ../lib
 INCLUDE = ../include
-MODULES = ../modules
 
 # compiler
 CC = gcc
@@ -11,10 +10,10 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = state_test.o $(MODULES)/state_alt.o $(MODULES)/set_utils.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a
+OBJS = state_alt.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a  ./set_utils.o
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = state_alt_test
+EXEC = state_alt
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =
@@ -33,7 +32,6 @@ clean:
 
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
-
 
 # Για να φτιάξουμε τα k08.a/libraylib.a τρέχουμε το make στο lib directory.
 $(LIB)/%.a:

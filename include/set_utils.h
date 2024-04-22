@@ -11,3 +11,7 @@ Pointer set_find_eq_or_greater(Set set, Pointer value);
 // από value. Αν δεν υπάρχει καμία τότε επιστρέφει NULL.
 
 Pointer set_find_eq_or_smaller(Set set, Pointer value);
+
+SetNode set_find_node_eq_or_smaller(Set set, Pointer value);
+
+SetNode set_find_node_eq_or_greater(Set set, Pointer value);

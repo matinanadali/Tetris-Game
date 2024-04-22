@@ -83,3 +83,4 @@ void state_update(State state, KeyState keys);
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη.
 
 void state_destroy(State state);
+

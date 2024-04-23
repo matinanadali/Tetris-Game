@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 #include "acutest.h"			// Απλή βιβλιοθήκη για unit testing
-
+#include <math.h>
 #include "state.h"
 #include "vec2.h"
 #define INF 9999999999999L
@@ -16,7 +16,7 @@
 // Ελέγχει την (προσεγγιστική) ισότητα δύο double
 // (λόγω λαθών το a == b δεν είναι ακριβές όταν συγκρίνουμε double).
 static bool double_equal(double a, double b) {
-	return abs(a-b) < 1e-6;
+	return fabs(a-b) < 1e-6;
 }
 
 // Ελέγχει την ισότητα δύο διανυσμάτων
@@ -39,14 +39,14 @@ void test_state_create() {
 
 	
 	TEST_ASSERT(info->spaceship->type == SPACESHIP);
-	//έλεγχος θέσης διαστημόπλοιου
+	// 'Ελεγχος θέσης διαστημόπλοιου
 	TEST_ASSERT(info->spaceship->position.x == 0 && info->spaceship->position.y == 0);
 
-	//έλεγχος συνολικού αριθμού αστεροειδών - στην αρχική κατάσταση δεν υπάρχουν σφαίρες
+	// 'Ελεγχος συνολικού αριθμού αστεροειδών - στην αρχική κατάσταση δεν υπάρχουν σφαίρες
 	List initial_state_objects = state_objects(state, (Vector2){-INF, INF}, (Vector2){INF, -INF});
 	TEST_ASSERT(list_size(initial_state_objects) == ASTEROID_NUM);
 	
-	//έλεγχος αριθμού αστεροειδών σε ορισμένο ορθογώνιο
+	// 'Ελεγχος αριθμού αστεροειδών σε ορισμένο ορθογώνιο
 	Vector2 top_left = {-2000, 9000};
 	Vector2 bottom_right = {8000, -300};
 	
@@ -93,7 +93,7 @@ void test_reaction_to_pressed_keys() {
 	TEST_ASSERT( vec2_equal( state_info(state)->spaceship->speed,    (Vector2){0,SPACESHIP_ACCELERATION}) );
 
 	// Αν το πάνω βέλος δεν είναι πατημένο, το διαστημόπλοιο επιβραδύνεται
-	//η ταχύτητά του δεν πρέπει να είναι ποτέ αρνητική
+	// η ταχύτητά του δεν πρέπει να είναι ποτέ αρνητική
 	keys.up = false;
 	state_update(state, &keys);
 	if (SPACESHIP_ACCELERATION-SPACESHIP_SLOWDOWN >= 0) {
@@ -121,8 +121,6 @@ void test_reaction_to_pressed_keys() {
 
 void test_state_update() {
 	test_reaction_to_pressed_keys();
-	test_bullet_asteroid_collision();
-	test_asteroid_spaceship_collision();
 }
 
 

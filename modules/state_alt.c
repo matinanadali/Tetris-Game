@@ -159,9 +159,12 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
 	//περιστροφή διαστημοπλοίου
 	if (keys->left || keys->right) {
-		double rotation_angle = (keys->left ? -1 : +1) * SPACESHIP_ROTATION;
+		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
 		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
 	}
+
+	// Μετατόπιση διαστημοπλοίου
+	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, speed_factor));
 	
 	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
 		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
@@ -174,9 +177,6 @@ void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
 			spaceship->speed = (Vector2){0,0};
 		}
 	}
-
-	// Μετατόπιση διαστημοπλοίου
-	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, speed_factor));
 }
 
 // Ενημερώνει την κατάσταση του αντικειμένου (αστεροειδούς-σφαίρας) object

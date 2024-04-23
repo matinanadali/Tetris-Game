@@ -14,7 +14,7 @@ LDFLAGS = -lm
 OBJS = state_test.o $(MODULES)/state_alt.o $(MODULES)/set_utils.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = state_alt_test
+EXEC = state_test
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =

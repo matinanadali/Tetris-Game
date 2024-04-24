@@ -23,12 +23,13 @@ bool is_zero(double a) {
 }
 
 void draw_triangle(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
-    int val = (pointA.x - pointB.x) * (pointA.y + pointB.y)
-              + (pointC.x - pointA.x) * (pointC.y + pointA.y);
- 
-    if (val > 0) {
+   double slope1 = (pointB.y - pointA.y) * (pointC.x - pointB.x);
+double slope2 = (pointC.y - pointB.y) * (pointB.x - pointA.x);
+
+    if (slope1 > slope2) {
         DrawTriangle(pointA, pointB, pointC, WHITE);
-    } else {
+    }
+    else {
         DrawTriangle(pointA, pointC, pointB, WHITE);
     }
  
@@ -46,26 +47,51 @@ void interface_draw_frame(State state) {
                             height / 2 - state_info(state)->spaceship->position.y};
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
 
-    Vector2 point = {0, 30};
-    if (angle <= -PI / 2) {
-        angle = 2*PI + angle;
-    }
-    point = vec2_rotate(point, angle - PI / 2);
-    point = vec2_scale(point, -1);
-    point = vec2_add(point, v);
-    
-    
+    Vector2 point = {0, -30};
     Vector2 pointB = {10, 0};
     Vector2 pointC = {-10, 0};
-   
-    pointB = vec2_rotate(pointB, angle - PI / 2);
+    if (angle >= 0 && angle <= PI / 2){
+        point = vec2_rotate(point, -angle + PI / 2);
+        pointB = vec2_rotate(pointB, -angle + PI / 2);
+        pointC = vec2_rotate(pointC, -angle + PI / 2);
+           point = vec2_add(point, v); 
     pointB = vec2_add(pointB, v);
-    
-    
-    pointC = vec2_rotate(pointC, angle - PI / 2);
     pointC = vec2_add(pointC, v);
     
     draw_triangle(point, pointB, pointC);
+    } else if (angle > PI / 2) {
+        point = vec2_rotate(point, -angle + PI / 2);
+        pointB = vec2_rotate(pointB, -angle + PI / 2);
+        pointC = vec2_rotate(pointC, -angle + PI / 2);
+            point = vec2_add(point, v); 
+    pointB = vec2_add(pointB, v);
+    pointC = vec2_add(pointC, v);
+    
+    draw_triangle(point, pointB, pointC);
+    } else if (angle < 0 && angle > -PI /2) {
+        point = vec2_rotate(point, -angle + PI / 2);
+        pointB = vec2_rotate(pointB, -angle + PI / 2);
+        pointC = vec2_rotate(pointC, -angle + PI / 2);
+     
+
+            point = vec2_add(point, v); 
+    pointB = vec2_add(pointB, v);
+    pointC = vec2_add(pointC, v);
+    
+    draw_triangle(point, pointB, pointC);
+    } else {
+        point = vec2_rotate(point, -angle + PI / 2);
+        pointB = vec2_rotate(pointB, -angle + PI / 2);
+        pointC = vec2_rotate(pointC, -angle + PI / 2);
+           printf("%f\n", state_info(state)->spaceship->speed.x);
+        point = vec2_add(point, v); 
+        pointB = vec2_add(pointB, v);
+        pointC = vec2_add(pointC, v);
+    draw_triangle(pointB, pointC, point);
+    }
+    
+  
+ 
    
    
    

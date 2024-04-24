@@ -157,7 +157,7 @@ void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
 	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
 		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
 		spaceship->speed = vec2_add(spaceship->speed, acceleration);
-	} else {        //επιβράδυνση διαστημοπλοίου
+	} else if (spaceship->speed.x > 0) {        //επιβράδυνση διαστημοπλοίου
 		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
 		spaceship->speed = vec2_add(spaceship->speed, slowdown);
 		//το διαστημόπλοιο ακινητοποιείται

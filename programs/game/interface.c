@@ -43,73 +43,40 @@ void interface_draw_frame(State state) {
     int height = GetScreenHeight();
 
 	// Σχεδιάζουμε το διαστημόπλοιο
-    Vector2 v = (Vector2){width / 2 - state_info(state)->spaceship->position.x, 
-                            height / 2 - state_info(state)->spaceship->position.y};
+    Vector2 new_origin = (Vector2){+width / 2-state_info(state)->spaceship->position.x, +height / 2-state_info(state)->spaceship->position.y};
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
 
     Vector2 point = {0, -30};
     Vector2 pointB = {10, 0};
-    Vector2 pointC = {-10, 0};
-    if (angle >= 0 && angle <= PI / 2){
-        point = vec2_rotate(point, -angle + PI / 2);
-        pointB = vec2_rotate(pointB, -angle + PI / 2);
-        pointC = vec2_rotate(pointC, -angle + PI / 2);
-           point = vec2_add(point, v); 
-    pointB = vec2_add(pointB, v);
-    pointC = vec2_add(pointC, v);
+    Vector2 pointC = {-10,0};
     
-    draw_triangle(point, pointB, pointC);
-    } else if (angle > PI / 2) {
-        point = vec2_rotate(point, -angle + PI / 2);
-        pointB = vec2_rotate(pointB, -angle + PI / 2);
-        pointC = vec2_rotate(pointC, -angle + PI / 2);
-            point = vec2_add(point, v); 
-    pointB = vec2_add(pointB, v);
-    pointC = vec2_add(pointC, v);
-    
-    draw_triangle(point, pointB, pointC);
-    } else if (angle < 0 && angle > -PI /2) {
-        point = vec2_rotate(point, -angle + PI / 2);
-        pointB = vec2_rotate(pointB, -angle + PI / 2);
-        pointC = vec2_rotate(pointC, -angle + PI / 2);
      
 
-            point = vec2_add(point, v); 
-    pointB = vec2_add(pointB, v);
-    pointC = vec2_add(pointC, v);
-    
-    draw_triangle(point, pointB, pointC);
-    } else {
-        point = vec2_rotate(point, -angle + PI / 2);
-        pointB = vec2_rotate(pointB, -angle + PI / 2);
-        pointC = vec2_rotate(pointC, -angle + PI / 2);
-           printf("%f\n", state_info(state)->spaceship->speed.x);
-        point = vec2_add(point, v); 
-        pointB = vec2_add(pointB, v);
-        pointC = vec2_add(pointC, v);
-    draw_triangle(pointB, pointC, point);
-    }
-    
+    point = vec2_rotate(point, -angle + PI / 2);
+    pointB = vec2_rotate(pointB, -angle + PI / 2);
+    pointC = vec2_rotate(pointC, -angle + PI / 2);
+
+    point = vec2_add(point, (Vector2){width/2, height/2}); 
+    pointB = vec2_add(pointB, (Vector2){width/2, height/2});
+    pointC = vec2_add(pointC, (Vector2){width/2, height/2});
   
- 
-   
-   
-   
+    
+    draw_triangle(pointB, pointC, point);
    
     // Σχεδιάζουμε τα υπόλοιπα αντικείμενα (σφαίρες και αστεροειδείς)
-    Vector2 top_left = vec2_add(v, (Vector2){- width/ 2, height / 2});
-    Vector2 bottom_right = vec2_add(v, (Vector2){width / 2, -height / 2});
+    Vector2 top_left = (Vector2)vec2_add((Vector2){-width/2, height/2}, (Vector2){-new_origin.x, new_origin.y});
+    Vector2 bottom_right = (Vector2)vec2_add((Vector2){width/2, -height/2}, (Vector2){-new_origin.x, new_origin.y});
     List objects = state_objects(state, top_left, bottom_right);
 
     for (ListNode node = list_first(objects); node != LIST_EOF; node = list_next(objects, node)) {
-        // Object object = list_node_value(objects, node);
-        // Color color;
-        // if (object->type == BULLET) {
-        //     color = RED;
-        // } else {
-        //     color = GREEN;
-        // }
-     //   DrawCircle(object->position.x + v.x, object->position.y + v.y, object->size, color);
+        Object object = list_node_value(objects, node);
+        Color color;
+        if (object->type == BULLET) {
+            color = RED;
+        } else {
+            color = GREEN;
+        }
+       DrawCircle(object->position.x + new_origin.x, -object->position.y + new_origin.y, object->size, color);
     }
     list_destroy(objects);
     //Σχεδιάζουμε το σκορ

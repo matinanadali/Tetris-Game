@@ -144,7 +144,19 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 }
 
 // Ενημερώνει την κατάσταση του διαστημοπλοίου
-void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
+void spaceship_update(Object spaceship, KeyState keys, State state) {
+	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
+		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
+		spaceship->speed = vec2_add(spaceship->speed, acceleration);
+	} else {        //επιβράδυνση διαστημοπλοίου
+		Vector2 initial_speed = state->info.spaceship->speed;
+		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
+		spaceship->speed = vec2_add(spaceship->speed, slowdown);
+		if (!(initial_speed.x * spaceship->speed.x > 0 && initial_speed.y * spaceship->speed.y > 0)) {
+			spaceship->speed = (Vector2){0,0};
+		}
+	}
+
 	//περιστροφή διαστημοπλοίου
 	if (keys->left || keys->right) {
 		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
@@ -152,19 +164,7 @@ void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
 	}
 
 	// Μετατόπιση διαστημοπλοίου
-	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, speed_factor));
-	
-	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
-		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
-		spaceship->speed = vec2_add(spaceship->speed, acceleration);
-	} else if (spaceship->speed.x > 0) {        //επιβράδυνση διαστημοπλοίου
-		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
-		spaceship->speed = vec2_add(spaceship->speed, slowdown);
-		//το διαστημόπλοιο ακινητοποιείται
-		if (spaceship->speed.x < 0 || spaceship->speed.y < 0) {
-			spaceship->speed = (Vector2){0,0};
-		}
-	}
+	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, state->speed_factor));
 }
 
 // Ενημερώνει την κατάσταση του αντικειμένου (αστεροειδούς-σφαίρας) object
@@ -251,7 +251,7 @@ void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
 	double initial_size = asteroid->size;
 	double initial_speed = vec2_distance((Vector2){0,0}, asteroid->speed);
 	state->info.score -= 10;
-
+	asteroid->size = 0;
 	if (initial_size >= 2*ASTEROID_MIN_SIZE) {
 		for (int i = 0; i < 2; i++) 
 			vector_insert_last(state->objects, create_new_asteroid(initial_size / 2, initial_speed * 1.5, state->info.spaceship->position));
@@ -260,23 +260,14 @@ void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
 	vector_remove_at(state->objects, pos);
 }
 
-void handle_asteroid_spaceship_collision(State state, int pos) {
+void handle_asteroid_spaceship_collision(State state, Object asteroid, int pos) {
+	asteroid->size = 0;
 	vector_remove_at(state->objects, pos);
 	state->info.score /= 2;
 }
 
 // Εντοπίζει και διαχειρίζεται τις συγκρούσεις αστεροειδούς-διαστημοπλοίου και αστεροειδούς-σφαίρας
 void handle_collisions(State state) {
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		Object object = vector_get_at(state->objects, i);
-		if (object->type == ASTEROID && collapses(state->info.spaceship, object)) {
-			// Έξαφανίζουμε τον αστεροειδή μηδενίζοντας το μέγεθός του
-			object->size = 0;
-			// Για κάθε σύγκρουση αστεροειδούς-διαστημοπλοίου το σκορ υποδιπλασιάζεται
-			state->info.score /= 2;
-		}
-	}
-
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		if (((Object)vector_get_at(state->objects, i))->type != ASTEROID) continue;
 		Object asteroid = vector_get_at(state->objects, i);
@@ -285,11 +276,13 @@ void handle_collisions(State state) {
 			Object bullet = vector_get_at(state->objects, j);
 			if (collapses(asteroid, bullet)) {
 				handle_bullet_asteroid_collision(state, asteroid, i);
+				i--;
 			}
 
 			}
 		if (collapses(asteroid, state->info.spaceship)) {
-			handle_asteroid_spaceship_collision(state, i);
+			handle_asteroid_spaceship_collision(state, asteroid, i);
+			i--;
 		}		
 	}
 }
@@ -305,6 +298,9 @@ void state_update(State state, KeyState keys) {
 
 	// Συγκρούσεις
 	handle_collisions(state);
+
+	// Προσθήκη νέων αστεροειδών
+	num_asteroids_update(state);
 	
 	// Ενημέρωση κατάστασης αντικειμένων
 	for (int i = 0; i < vector_size(state->objects); i++) {
@@ -312,21 +308,21 @@ void state_update(State state, KeyState keys) {
 		object_update(current_object, state->speed_factor);
 	}
 
-	// Ενημέρωση κατάστασης διαστημοπλοίου
-	spaceship_update(state_info(state)->spaceship, keys, state->speed_factor);
-	
-	// Προσθήκη νέων αστεροειδών
-	num_asteroids_update(state);
-	
 	// Προσθήκη νέας σφαίρας
 	if (keys->space) {
 		add_bullet(state);
 	}
+	// Ενημέρωση κατάστασης διαστημοπλοίου
+	spaceship_update(state_info(state)->spaceship, keys, state);
+	
+	
+	
+	
 	// Μείωση του αριθμού frames που απαιτούνται για να επιτραπεί η επόμενη σφαίρα
 	state->next_bullet--;
 
 	// Αύξηση της ταχύτητας παιχνιδιού αν το σκορ φτάσει σε κάποιο πολλαπλάσιο του 100
-	if (state != 0 && state->info.score % 100 == 0) {
+	if (state->info.score != 0 && state->info.score % 100 == 0) {
 		state->speed_factor *= 1.1;
 	}
 	game_update(state, state->info.paused && keys->n);

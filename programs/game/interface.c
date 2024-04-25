@@ -27,10 +27,10 @@ void draw_triangle(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
 double slope2 = (pointC.y - pointB.y) * (pointB.x - pointA.x);
 
     if (slope1 > slope2) {
-        DrawTriangle(pointA, pointB, pointC, WHITE);
+        DrawTriangleLines(pointA, pointB, pointC, WHITE);
     }
     else {
-        DrawTriangle(pointA, pointC, pointB, WHITE);
+        DrawTriangleLines(pointA, pointC, pointB, WHITE);
     }
  
 }
@@ -43,12 +43,12 @@ void interface_draw_frame(State state) {
     int height = GetScreenHeight();
 
 	// Σχεδιάζουμε το διαστημόπλοιο
-    Vector2 new_origin = (Vector2){+width / 2-state_info(state)->spaceship->position.x, +height / 2-state_info(state)->spaceship->position.y};
+  //  Vector2 new_origin = (Vector2){+width / 2-state_info(state)->spaceship->position.x, +height / 2-state_info(state)->spaceship->position.y};
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
 
-    Vector2 point = {0, -30};
-    Vector2 pointB = {10, 0};
-    Vector2 pointC = {-10,0};
+    Vector2 point = {0, -40};
+    Vector2 pointB = {20, 0};
+    Vector2 pointC = {-20,0};
     
      
 
@@ -62,21 +62,21 @@ void interface_draw_frame(State state) {
   
     
     draw_triangle(pointB, pointC, point);
-   
+   double sx = state_info(state)->spaceship->position.x;
+    double sy = state_info(state)->spaceship->position.y;
     // Σχεδιάζουμε τα υπόλοιπα αντικείμενα (σφαίρες και αστεροειδείς)
-    Vector2 top_left = (Vector2)vec2_add((Vector2){-width/2, height/2}, (Vector2){-new_origin.x, new_origin.y});
-    Vector2 bottom_right = (Vector2)vec2_add((Vector2){width/2, -height/2}, (Vector2){-new_origin.x, new_origin.y});
+    Vector2 top_left = (Vector2){-width/2+sx, sy+height/2};
+    Vector2 bottom_right = (Vector2){sx+width/2, -height/2+sy};
     List objects = state_objects(state, top_left, bottom_right);
 
     for (ListNode node = list_first(objects); node != LIST_EOF; node = list_next(objects, node)) {
         Object object = list_node_value(objects, node);
-        Color color;
         if (object->type == BULLET) {
-            color = RED;
+            DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
-            color = GREEN;
+            DrawCircleLines(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         }
-       DrawCircle(object->position.x + new_origin.x, -object->position.y + new_origin.y, object->size, color);
+       
     }
     list_destroy(objects);
     //Σχεδιάζουμε το σκορ

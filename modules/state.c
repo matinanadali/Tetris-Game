@@ -77,15 +77,17 @@ static void add_asteroids(State state, int num) {
 	}
 }
 
+// Βοηθητική συνάρτηση: αφαιρεί το στοιχείο στη pos του vector
 void vector_remove_at(Vector vector, int pos) {
-	Pointer value_to_remove = vector_get_at(vector, pos);
 	Pointer last_value = vector_get_at(vector, vector_size(vector)-1);
-	Pointer temp;
-	temp = last_value;
-	last_value = value_to_remove;
-	value_to_remove = temp;
+	
+	// Ανταλλαγή στοιχείου προς διαγραφή με το τελευταίο στοιχείο του vector
+	vector_set_at(vector, pos, last_value);
+
+	// Διαγραφή τελευταίου στοιχείου
 	vector_remove_last(vector);
 }
+
 // Δημιουργεί και επιστρέφει την αρχική κατάσταση του παιχνιδιού
 State state_create() {
 	// Δημιουργία του state
@@ -115,14 +117,22 @@ State state_create() {
 	return state;
 }
 
-// Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
+// Μεταβάλλει το σκορ του state κατά points πόντους
+// Αν το τελικό σκορ προκύψει αρνητικό, μηδενίζεται
+void score_update(State state, int points) {
+	state->info.score += points;
+	if (state->info.score < 0) {
+		state->info.score = 0;
+	}
+}
 
+// Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
 StateInfo state_info(State state) {
 	return &state->info;
 }
 
-//ελέγχει αν το σημείο στη θέση position είναι εντός του ορθογωνίου που ορίζουν 
-//τα σημεία top_left και bottom_right
+// Eλέγχει αν το σημείο στη θέση position είναι εντός του ορθογωνίου που ορίζουν 
+// τα σημεία top_left και bottom_right
 bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_right) {
 	return position.x >= top_left.x && 
 		   position.x <= bottom_right.x &&
@@ -135,29 +145,35 @@ bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_righ
 // γωνία top_left και κάτω δεξιά bottom_right.
 List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 	List object_list = list_create(NULL);
+	
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		Object current_object = vector_get_at(state->objects, i);
-		if (is_inside_rectangle(current_object->position, top_left, bottom_right)) 
+		if (is_inside_rectangle(current_object->position, top_left, bottom_right)) {
 			list_insert_next(object_list, list_last(object_list), current_object);
+		}
 	}
+
 	return object_list;
 }
 
 // Ενημερώνει την κατάσταση του διαστημοπλοίου
 void spaceship_update(Object spaceship, KeyState keys, State state) {
-	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
+	if (keys->up) {  // Eπιτάχυνση διαστημοπλοίου
 		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
 		spaceship->speed = vec2_add(spaceship->speed, acceleration);
-	} else {        //επιβράδυνση διαστημοπλοίου
+	} else {        // Eπιβράδυνση διαστημοπλοίου
 		Vector2 initial_speed = state->info.spaceship->speed;
 		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
 		spaceship->speed = vec2_add(spaceship->speed, slowdown);
+
+		// Η επιβράδυνση του διαστημοπλοίου μειώνει το μέτρο της ταχύτητας αλλά δεν πρέπει να αλλάζει την κατεύθυνσή της
+		// Αν η νέα ταχύτητα δεν έχει την ίδια κατεύθυνση με την αρχική, μηδενίζεται
 		if (!(initial_speed.x * spaceship->speed.x > 0 && initial_speed.y * spaceship->speed.y > 0)) {
 			spaceship->speed = (Vector2){0,0};
 		}
 	}
 
-	//περιστροφή διαστημοπλοίου
+	// Περιστροφή διαστημοπλοίου
 	if (keys->left || keys->right) {
 		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
 		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
@@ -173,30 +189,27 @@ void object_update(Object object, int speed_factor) {
 	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
 }
 
-// Ενημερώνει την κατάσταση του παιχνιδιού - paused / not paused
-void game_update(State state, bool togglePause) {
-	if (togglePause) {
-		state->info.paused = !state->info.paused;
-	} 
-}
-
-// Ελέγχει αν ο αστεροειδής απέχει λιγότερο από ASTEROID_MAX_DIST από το διαστημόπλοιο
-bool is_near_spaceship(Object object, Vector2 spaceship_position) {
-	return vec2_distance(object->position, spaceship_position) < ASTEROID_MAX_DIST;
-}
-
 // Προσθέτει αστεροειδείς ώστε να υπάρχουν τουλάχιστον ASTEROID_NUM κοντά στο διαστημόπλοιο
 void num_asteroids_update(State state) {
 	int asteroids_near_spaceship = 0;
 	
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		Object current_object = vector_get_at(state->objects, i);
-		if (current_object->type != ASTEROID) continue;
-		if (is_near_spaceship(current_object, state->info.spaceship->position)) {
-			asteroids_near_spaceship++;
-		}
+	// Συντεταγμένες διαστημοπλοίου
+	double sx = state->info.spaceship->position.x;
+	double sy = state->info.spaceship->position.y;
+	// Λίστα αντικειμένων στο τετράγωνο με κέντρο το διαστημόπλοιο και πλευρά 2 ASTEROID_MAX_DIST 
+	List objects_near_spaceship = state_objects(state, (Vector2){sx - ASTEROID_MAX_DIST, sy + ASTEROID_MAX_DIST},
+												 	   (Vector2){sx + ASTEROID_MAX_DIST, sy - ASTEROID_MAX_DIST});
+	
+	for (ListNode node = list_first(objects_near_spaceship); node != LIST_EOF; node = list_next(objects_near_spaceship, node)) {
+		asteroids_near_spaceship++;
 	}
+	
+	list_destroy(objects_near_spaceship);
 
+	// Για κάθε αστεροειδή που δημιουργείται, το σκορ αυξάνεται κατά 1
+	if (ASTEROID_NUM - asteroids_near_spaceship > 0) {
+		score_update(state, ASTEROID_NUM - asteroids_near_spaceship);
+	}
 	add_asteroids(state, ASTEROID_NUM - asteroids_near_spaceship);
 }
 
@@ -211,6 +224,7 @@ void add_bullet(State state) {
 	Vector2 position = spaceship->position;
 
 	vector_insert_last(state->objects, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
+
 	state->next_bullet = BULLET_DELAY;
 }
 
@@ -247,40 +261,61 @@ Object create_new_asteroid(int size, int speed_value, Vector2 spaceship_position
 	return new_asteroid;
 }
 
+// Διαχειρίζεται τις συγκρούσεις αστεροειδούς - σφαίρας
 void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
 	double initial_size = asteroid->size;
 	double initial_speed = vec2_distance((Vector2){0,0}, asteroid->speed);
-	state->info.score -= 10;
-	asteroid->size = 0;
+	// Για κάθε τέτοια σύγκρουση, το σκορ μειώνεται κατά 10
+	score_update(state, -10);
+
+	// Διαγραφή αρχικού αστεροειδή
+	vector_remove_at(state->objects, pos);
+
+	// Αν το μέγεθος του αρχικού αστεροειδούς ήταν αρκετά μεγάλο, 
+	// δημιουργούνται 2 νέοι με το μισό μέγεθος και ταχύτητα μέτρου 1.5 φορές μεγαλύτερη του αρχικού
 	if (initial_size >= 2*ASTEROID_MIN_SIZE) {
-		for (int i = 0; i < 2; i++) 
+		for (int i = 0; i < 2; i++) {
 			vector_insert_last(state->objects, create_new_asteroid(initial_size / 2, initial_speed * 1.5, state->info.spaceship->position));
-		state->info.score += 2;
+		}
+		// Για κάθε νέο αστεροιειδή το σκορ αυξάνεται κατά 1
+		score_update(state, 2);
 	}
-	vector_remove_at(state->objects, pos);
+	
 }
 
+// Διαχειρίζεται τη σύγκρουση αστεροειδή - διαστημοπλοίου
 void handle_asteroid_spaceship_collision(State state, Object asteroid, int pos) {
-	asteroid->size = 0;
+	// Ο αστεροειδής διαγράφεται
 	vector_remove_at(state->objects, pos);
-	state->info.score /= 2;
+	// Το σκορ υποδιπλασιάζεται
+	score_update(state, -state->info.score/2);
 }
 
-// Εντοπίζει και διαχειρίζεται τις συγκρούσεις αστεροειδούς-διαστημοπλοίου και αστεροειδούς-σφαίρας
+// Εντοπίζει τις συγκρούσεις αστεροειδή-διαστημοπλοίου και αστεροειδή-σφαίρας
 void handle_collisions(State state) {
+	// Εντοπισμό συγκρούσεων αστεροειδή-σφαίρας
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		if (((Object)vector_get_at(state->objects, i))->type != ASTEROID) continue;
+
 		Object asteroid = vector_get_at(state->objects, i);
+		bool destroyed  = false;
+		
 		for (int j = 0; j < vector_size(state->objects); j++) {
 			if (((Object)vector_get_at(state->objects, j))->type != BULLET) continue;	
 			Object bullet = vector_get_at(state->objects, j);
+
 			if (collapses(asteroid, bullet)) {
 				handle_bullet_asteroid_collision(state, asteroid, i);
-				i--;
+				// Αν ο αστεροειδής καταστραφεί, δεν μπορεί να συγκρουστεί ξανά με κάποιο αντικείμενο
+				destroyed = true;
+				i--;	// Για να μην προσπεράσουμε το στοιχείο που μεταφέρθηκε στη θέση i από τη vector_remove_at
+				break;
 			}
 
-			}
-		if (collapses(asteroid, state->info.spaceship)) {
+		}
+
+		// Εντοπισμό συγκρούσεων αστεροειδή-διαστημοπλοίου
+		if (!destroyed && collapses(asteroid, state->info.spaceship)) {
 			handle_asteroid_spaceship_collision(state, asteroid, i);
 			i--;
 		}		
@@ -291,8 +326,15 @@ void handle_collisions(State state) {
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys) {
-	// Αλλάζει την κατάσταση του παιχνιδιού (paused - not paused) αν το p είναι πατημένο
-	game_update(state, keys->p);
+	// Αλλαγή κατάστασης του παιχνιδιού (paused - not paused)
+	if (keys->p) {
+		state->info.paused = !state->info.paused;
+	}
+
+	// Αν το n είναι πατημένο, αφηνούμε το τρέχον frame να εξελιχθεί
+	if (keys->n) {
+		state->info.paused = false;
+	}
 
 	if (state->info.paused) return;
 
@@ -303,20 +345,25 @@ void state_update(State state, KeyState keys) {
 	num_asteroids_update(state);
 	
 	// Ενημέρωση κατάστασης αντικειμένων
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		Object current_object = vector_get_at(state->objects, i);
+	double sx = state_info(state)->spaceship->position.x;
+	double sy = state_info(state)->spaceship->position.y;
+	
+	// Λίστα αντικειμένων στο ορθογένιο με κέντρο το διαστημόπλοιο και πλευρές 4screen_width και 4screen_height
+	List playing_objects = state_objects(state, (Vector2){sx - 2*GetScreenWidth(), sy + 2*GetScreenHeight()}, 
+												(Vector2){sx + 2*GetScreenWidth(), sy - 2*GetScreenHeight()});
+	for (ListNode node = list_first(playing_objects); node != LIST_EOF; node = list_next(playing_objects, node)) {
+		Object current_object = list_node_value(playing_objects, node);
 		object_update(current_object, state->speed_factor);
 	}
+	list_destroy(playing_objects);
 
 	// Προσθήκη νέας σφαίρας
 	if (keys->space) {
 		add_bullet(state);
 	}
+	
 	// Ενημέρωση κατάστασης διαστημοπλοίου
 	spaceship_update(state_info(state)->spaceship, keys, state);
-	
-	
-	
 	
 	// Μείωση του αριθμού frames που απαιτούνται για να επιτραπεί η επόμενη σφαίρα
 	state->next_bullet--;
@@ -325,7 +372,11 @@ void state_update(State state, KeyState keys) {
 	if (state->info.score != 0 && state->info.score % 100 == 0) {
 		state->speed_factor *= 1.1;
 	}
-	game_update(state, state->info.paused && keys->n);
+
+	// Αν το n είναι πατημένο, διακόπτουμε την εξέλιξη του παιχνιδιού μετά την εκτέλεση του τρέχοντος frame
+	if (keys->n) {
+		state->info.paused = true;
+	}
 }
 
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη

@@ -21,7 +21,6 @@ struct state {
 
 
 // Δημιουργεί και επιστρέφει ένα αντικείμενο
-
 static Object create_object(ObjectType type, Vector2 position, Vector2 speed, Vector2 orientation, double size) {
 	Object obj = malloc(sizeof(*obj));
 	obj->type = type;
@@ -33,7 +32,6 @@ static Object create_object(ObjectType type, Vector2 position, Vector2 speed, Ve
 }
 
 // Επιστρέφει έναν τυχαίο πραγματικό αριθμό στο διάστημα [min,max]
-
 static double randf(double min, double max) {
 	return min + (double)rand() / RAND_MAX * (max - min);
 }
@@ -44,7 +42,6 @@ static double randf(double min, double max) {
 // - Η αρχή των αξόνων είναι η θέση του διαστημόπλοιου στην αρχή του παιχνιδιού
 // - Στο άξονα x οι συντεταγμένες μεγαλώνουν προς τα δεξιά.
 // - Στον άξονα y οι συντεταγμένες μεγαλώνουν προς τα πάνω.
-
 static void add_asteroids(State state, int num) {
 	for (int i = 0; i < num; i++) {
 		// Τυχαία θέση σε απόσταση [ASTEROID_MIN_DIST, ASTEROID_MAX_DIST]
@@ -226,6 +223,8 @@ void add_bullet(State state) {
 	vector_insert_last(state->objects, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
 
 	state->next_bullet = BULLET_DELAY;
+	Sound bullet_snd = LoadSound("../programs/game/assets/bullet.mp3");
+	PlaySound(bullet_snd);
 }
 
 // Ελέγχει αν τα αντικέιμενα a και b (θεωρούνται σφαιρικά κέντρου object->position και ακτίνας object->size) συγκρούονται
@@ -280,7 +279,6 @@ void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
 		// Για κάθε νέο αστεροιειδή το σκορ αυξάνεται κατά 1
 		score_update(state, 2);
 	}
-	
 }
 
 // Διαχειρίζεται τη σύγκρουση αστεροειδή - διαστημοπλοίου

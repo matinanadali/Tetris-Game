@@ -7,11 +7,21 @@
 #include <stdio.h>
 
 
-#define IMG_WIDTH 64
-#define IMG_HEIGHT 64
+#define IMG_WIDTH 100
+#define IMG_HEIGHT 37
 
 Music music;
 Texture spaceship;
+Texture moving_effect;
+
+static bool double_equal(double a, double b) {
+	return fabs(a-b) < 1e-6;
+}
+
+// Ελέγχει την ισότητα δύο διανυσμάτων
+static bool vec2_equal(Vector2 a, Vector2 b) {
+	return double_equal(a.x, b.x) && double_equal(a.y, b.y);
+}
 
 void interface_init() {
 	// Αρχικοποίηση του παραθύρου
@@ -24,6 +34,7 @@ void interface_init() {
     PlayMusicStream(music);
 
     spaceship = LoadTexture("assets/spaceship.png");
+    moving_effect = LoadTexture("assets/moving_effect.png");
 }
 
 void interface_close() {
@@ -64,8 +75,20 @@ void interface_draw_frame(State state) {
   
     DrawTexturePro(spaceship, (Rectangle){0, 0, IMG_WIDTH, IMG_HEIGHT}, 
                               (Rectangle){width/2, height/2, IMG_WIDTH, IMG_HEIGHT}, 
-                              (Vector2){IMG_WIDTH/2, IMG_HEIGHT/2},
-                              -radians_to_degrees(angle) , WHITE);
+                              (Vector2){IMG_WIDTH/2, 0},
+                              -radians_to_degrees(angle), WHITE);
+
+    Vector2 speed = state_info(state)->spaceship->speed;
+    if (!vec2_equal(speed, (Vector2){0,0})) {
+        DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
+                                      (Rectangle){width/2-126, height/2+IMG_HEIGHT/3, 126, 16},
+                                      (Vector2){126, 16},
+                                      -radians_to_degrees(angle), WHITE);
+        DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
+                                      (Rectangle){width/2-126, height/2-IMG_HEIGHT/3, 126, 16},
+                                      (Vector2){126, 16},
+                                      -radians_to_degrees(angle), WHITE);
+    }
 
     // Συντεταγμένες διαστημοπλοίου
     double sx = state_info(state)->spaceship->position.x;

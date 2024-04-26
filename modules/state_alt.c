@@ -96,8 +96,8 @@ State state_create() {
 	state->info.score = 0;				// Αρχικό σκορ 0
 
 	// Δημιουργούμε το vector των αντικειμένων, και προσθέτουμε αντικείμενα
-	state->asteroids = set_create(compare, NULL);
-	state->bullets = set_create(compare, NULL);
+	state->asteroids = set_create(compare, free);
+	state->bullets = set_create(compare, free);
 
 	// Δημιουργούμε το διαστημόπλοιο
 	state->info.spaceship = create_object(
@@ -343,13 +343,7 @@ void state_update(State state, KeyState keys) {
 
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη
 void state_destroy(State state) {
-	for (SetNode node = set_first(state->asteroids); node != SET_EOF; node = set_next(state->asteroids, node))  {
-		free(set_node_value(state->asteroids, node));
-	}
     set_destroy(state->asteroids);
-	for (SetNode node = set_first(state->bullets); node != SET_EOF; node = set_next(state->bullets, node))  {
-		free(set_node_value(state->bullets, node));
-	}
     set_destroy(state->bullets);
 	free(state->info.spaceship);
 	free(state);

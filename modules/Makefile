@@ -10,10 +10,12 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = state_alt.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a  ./set_utils.o
+OBJS = state.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a
+ALT_OBJS = state_alt.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a ./set_utils.o
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = state_alt
+EXEC = state
+ALT_EXEC = state_alt
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =
@@ -22,16 +24,26 @@ ARGS =
 include $(LIB)/libraylib.mk
 
 
-all: $(EXEC)
+all: $(EXEC) $(ALT_EXEC)
 
+# Αρχική υλοποίηση
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
+
+# Εναλλακτική υλοποίηση
+$(ALT_EXEC): $(ALT_OBJS)
+	$(CC) $(ALT_OBJS) -o $(ALT_EXEC) $(LDFLAGS)
 
 clean:
 	rm -f $(OBJS) $(EXEC)
 
+# Εκτέλεση αρχικού προγράμματος
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
+
+# Εκτέλεση εναλλακτικής υλοποίησης
+alt_run: $(ALT_EXEC)
+	./$(ALT_EXEC) $(ARGS)
 
 # Για να φτιάξουμε τα k08.a/libraylib.a τρέχουμε το make στο lib directory.
 $(LIB)/%.a:

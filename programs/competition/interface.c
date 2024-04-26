@@ -75,7 +75,7 @@ void interface_draw_frame(State state) {
   
     DrawTexturePro(spaceship, (Rectangle){0, 0, IMG_WIDTH, IMG_HEIGHT}, 
                               (Rectangle){width/2, height/2, IMG_WIDTH, IMG_HEIGHT}, 
-                              (Vector2){IMG_WIDTH/2, 0},
+                              (Vector2){IMG_WIDTH/2, IMG_HEIGHT/2},
                               -radians_to_degrees(angle), WHITE);
 
     Vector2 speed = state_info(state)->spaceship->speed;

@@ -79,14 +79,17 @@ void interface_draw_frame(State state) {
                               -radians_to_degrees(angle), WHITE);
 
     Vector2 speed = state_info(state)->spaceship->speed;
+    Vector2 top_left_corner = {-IMG_WIDTH/2, -IMG_HEIGHT/2};
+    top_left_corner = vec2_rotate(top_left_corner, angle);
+    top_left_corner = vec2_add(top_left_corner, (Vector2){width/2, height/2});
     if (!vec2_equal(speed, (Vector2){0,0})) {
         DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
-                                      (Rectangle){width/2-126, height/2+IMG_HEIGHT/3, 126, 16},
-                                      (Vector2){126, 16},
+                                      (Rectangle){top_left_corner.x, top_left_corner.y, 126, 16},
+                                      (Vector2){126, 0},
                                       -radians_to_degrees(angle), WHITE);
         DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
                                       (Rectangle){width/2-126, height/2-IMG_HEIGHT/3, 126, 16},
-                                      (Vector2){126, 16},
+                                      (Vector2){126, 8},
                                       -radians_to_degrees(angle), WHITE);
     }
 

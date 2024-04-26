@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stdio.h>
 
+
+#define IMG_WIDTH 64
+#define IMG_HEIGHT 64
+
 Music music;
 Texture spaceship;
 
@@ -40,6 +44,10 @@ void DrawTriangleLinesHelper(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
     }
 } 
 
+float radians_to_degrees(double angle_in_radians) {
+    return 180 * angle_in_radians / PI;
+}
+
 void interface_draw_frame(State state) {
     UpdateMusicStream(music);
     BeginDrawing();
@@ -54,7 +62,10 @@ void interface_draw_frame(State state) {
     // Η γωνία που σχηματίζει το διάνυσμα orientation με τον θετικό ημιάξονα x
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
   
-    DrawTextureEx(spaceship, (Vector2){width/2, height/2}, angle, 1, WHITE);
+    DrawTexturePro(spaceship, (Rectangle){0, 0, IMG_WIDTH, IMG_HEIGHT}, 
+                              (Rectangle){width/2, height/2, IMG_WIDTH, IMG_HEIGHT}, 
+                              (Vector2){IMG_WIDTH/2, IMG_HEIGHT},
+                              radians_to_degrees(angle), WHITE);
 
     // Συντεταγμένες διαστημοπλοίου
     double sx = state_info(state)->spaceship->position.x;

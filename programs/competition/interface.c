@@ -7,8 +7,11 @@
 #include <stdio.h>
 
 
-#define IMG_WIDTH 100
-#define IMG_HEIGHT 37
+#define SPACESHIP_WIDTH 100
+#define SPACESHIP_HEIGHT 37
+
+#define MOVING_WIDTH 79
+#define MOVING_HEIGHT 10
 
 Music music;
 Texture spaceship;
@@ -73,23 +76,28 @@ void interface_draw_frame(State state) {
     // Η γωνία που σχηματίζει το διάνυσμα orientation με τον θετικό ημιάξονα x
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
   
-    DrawTexturePro(spaceship, (Rectangle){0, 0, IMG_WIDTH, IMG_HEIGHT}, 
-                              (Rectangle){width/2, height/2, IMG_WIDTH, IMG_HEIGHT}, 
-                              (Vector2){IMG_WIDTH/2, IMG_HEIGHT/2},
+    DrawTexturePro(spaceship, (Rectangle){0, 0, SPACESHIP_WIDTH, SPACESHIP_HEIGHT}, 
+                              (Rectangle){width/2, height/2, SPACESHIP_WIDTH, SPACESHIP_HEIGHT}, 
+                              (Vector2){SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2},
                               -radians_to_degrees(angle), WHITE);
 
     Vector2 speed = state_info(state)->spaceship->speed;
-    Vector2 top_left_corner = {-IMG_WIDTH/2, -IMG_HEIGHT/2};
-    top_left_corner = vec2_rotate(top_left_corner, angle);
+    Vector2 top_left_corner = (Vector2){-SPACESHIP_WIDTH/2, -SPACESHIP_HEIGHT/2 + 7};
+    top_left_corner = vec2_rotate(top_left_corner, -angle);
     top_left_corner = vec2_add(top_left_corner, (Vector2){width/2, height/2});
+
+    Vector2 bottom_left_corner = (Vector2){-SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2 - 7};
+    bottom_left_corner = vec2_rotate(bottom_left_corner, -angle);
+    bottom_left_corner = vec2_add(bottom_left_corner, (Vector2){width/2, height/2});
+
     if (!vec2_equal(speed, (Vector2){0,0})) {
-        DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
-                                      (Rectangle){top_left_corner.x, top_left_corner.y, 126, 16},
-                                      (Vector2){126, 0},
+        DrawTexturePro(moving_effect, (Rectangle){0, 0, MOVING_WIDTH, MOVING_HEIGHT},
+                                      (Rectangle){top_left_corner.x, top_left_corner.y, MOVING_WIDTH, MOVING_HEIGHT},
+                                      (Vector2){MOVING_WIDTH, 0},
                                       -radians_to_degrees(angle), WHITE);
-        DrawTexturePro(moving_effect, (Rectangle){0, 0, 126, 16},
-                                      (Rectangle){width/2-126, height/2-IMG_HEIGHT/3, 126, 16},
-                                      (Vector2){126, 8},
+        DrawTexturePro(moving_effect, (Rectangle){0, 0, MOVING_WIDTH, MOVING_HEIGHT},
+                                      (Rectangle){bottom_left_corner.x, bottom_left_corner.y, MOVING_WIDTH, MOVING_HEIGHT},
+                                      (Vector2){MOVING_WIDTH, MOVING_HEIGHT},
                                       -radians_to_degrees(angle), WHITE);
     }
 

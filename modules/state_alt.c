@@ -114,6 +114,17 @@ State state_create() {
 	return state;
 }
 
+
+// Μεταβάλλει το σκορ του state κατά points πόντους
+// Αν το τελικό σκορ προκύψει αρνητικό, μηδενίζεται
+void score_update(State state, int points) {
+	state->info.score += points;
+	if (state->info.score < 0) {
+		state->info.score = 0;
+	}
+}
+
+
 // Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
 StateInfo state_info(State state) {
 	return &state->info;
@@ -185,21 +196,8 @@ void object_update(Object object, int speed_factor) {
 	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
 }
 
-// Ενημερώνει την κατάσταση του παιχνιδιού - paused / not paused
-void game_update(State state, bool togglePause) {
-	if (togglePause) {
-		state->info.paused = !state->info.paused;
-	} 
-}
-
-// Ελέγχει αν ο αστεροειδής απέχει λιγότερο από ASTEROID_MAX_DIST από το διαστημόπλοιο
-bool is_near_spaceship(Object object, Vector2 spaceship_position) {
-	return vec2_distance(object->position, spaceship_position) < ASTEROID_MAX_DIST;
-}
-
 // Προσθέτει αστεροειδείς ώστε να υπάρχουν τουλάχιστον ASTEROID_NUM κοντά στο διαστημόπλοιο
 void num_asteroids_update(State state) {
-
     Vector2 top_left = (Vector2){-ASTEROID_MAX_DIST + state->info.spaceship->position.x, +ASTEROID_MAX_DIST + state->info.spaceship->position.y};
 	Vector2 bottom_right = (Vector2){+ASTEROID_MAX_DIST + state->info.spaceship->position.x, -ASTEROID_MAX_DIST + state->info.spaceship->position.y};
     List asteroids_near_spaceship = state_objects_by_type(state, top_left, bottom_right, ASTEROID);
@@ -223,7 +221,7 @@ void add_bullet(State state) {
 }
 
 // Ελέγχει αν τα αντικέιμενα a και b (θεωρούνται σφαιρικά κέντρου object->position και ακτίνας object->size) συγκρούονται
-bool collapses(Object a, Object b) {
+bool collide(Object a, Object b) {
 	return CheckCollisionCircles(a->position, a->size, b->position, b->size);
 }
 
@@ -258,19 +256,20 @@ Object create_new_asteroid(double size, double speed_value, Vector2 spaceship_po
 void handle_bullet_asteroid_collision(State state, Object asteroid) {
 	double initial_size = asteroid->size;
 	double initial_speed = vec2_distance((Vector2){0,0}, asteroid->speed);
-	state->info.score -= 10;
+	score_update(state, -10);
 
 	if (initial_size >= 2*ASTEROID_MIN_SIZE) {
-		for (int i = 0; i < 2; i++) 
+		for (int i = 0; i < 2; i++) {
 			set_insert(state->asteroids, create_new_asteroid(initial_size / 2, initial_speed * 1.5, state->info.spaceship->position));
-		state->info.score += 2;
+		}
+		score_update(state, 2);
 	}
 	set_remove(state->asteroids, asteroid);
 }
 
 void handle_asteroid_spaceship_collision(State state, Object asteroid) {
 	set_remove(state->asteroids, asteroid);
-	state->info.score /= 2;
+	score_update(state, -state->info.score/2);
 }
 
 // Εντοπίζει και διαχειρίζεται τις συγκρούσεις αστεροειδούς-διαστημοπλοίου και αστεροειδούς-σφαίρας
@@ -282,12 +281,12 @@ void handle_collisions(State state) {
 		Object asteroid = list_node_value(asteroids, a);
 		for (ListNode b = list_first(bullets); b != LIST_EOF; b = list_next(bullets, b)) {
 			Object bullet = list_node_value(bullets, b); 
-			if (collapses(asteroid, bullet)) {
+			if (collide(asteroid, bullet)) {
 				handle_bullet_asteroid_collision(state, asteroid);
 			}
 		}
 
-		if (collapses(asteroid, state->info.spaceship)) {
+		if (collide(asteroid, state->info.spaceship)) {
 			handle_asteroid_spaceship_collision(state, asteroid);
 		}
 	}
@@ -300,13 +299,20 @@ void handle_collisions(State state) {
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys) {
 	
-	// Αλλάζει την κατάσταση του παιχνιδιού (paused - not paused) αν το p είναι πατημένο
-	game_update(state, keys->p);
+	// Αλλαγή κατάστασης του παιχνιδιού (paused - not paused)
+	if (keys->p) {
+		state->info.paused = !state->info.paused;
+	}
+
+	// Αν το n είναι πατημένο, αφηνούμε το τρέχον frame να εξελιχθεί
+	if (keys->n) {
+		state->info.paused = false;
+	}
 
 	if (state->info.paused) return;
 
 	// Συγκρούσεις
-//	handle_collisions(state);
+	handle_collisions(state);
 
 	// Ενημέρωση κατάστασης αντικειμένων
     int width = GetScreenWidth();
@@ -338,7 +344,11 @@ void state_update(State state, KeyState keys) {
 	if (state != 0 && state->info.score % 100 == 0) {
 		state->speed_factor *= 1.1;
 	}
-	game_update(state, state->info.paused && keys->n);
+	
+	// Αν το n είναι πατημένο, διακόπτουμε την εξέλιξη του παιχνιδιού μετά την εκτέλεση του τρέχοντος frame
+	if (keys->n) {
+		state->info.paused = true;
+	}
 }
 
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη

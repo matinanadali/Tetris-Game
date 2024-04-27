@@ -5,7 +5,9 @@
 #include "vec2.h"
 #include <math.h>
 #include <stdio.h>
-
+#include <string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #define SPACESHIP_WIDTH 100
 #define SPACESHIP_HEIGHT 37
@@ -13,9 +15,13 @@
 #define MOVING_WIDTH 79
 #define MOVING_HEIGHT 10
 
+#define ASTEROID_WIDTH 89
+#define ASTEROID_HEIGHT 75
+
 Music music;
 Texture spaceship;
 Texture moving_effect;
+Texture asteroids[8];
 
 static bool double_equal(double a, double b) {
 	return fabs(a-b) < 1e-6;
@@ -38,6 +44,15 @@ void interface_init() {
 
     spaceship = LoadTexture("assets/spaceship.png");
     moving_effect = LoadTexture("assets/moving_effect.png");
+    for (char i = '1'; i <= '8'; i++) {
+        char file_path[100] = "assets/meteor";
+        char number[2];
+        number[0] = i;
+        strcat(file_path, number);
+        strcat(file_path, ".png");
+        asteroids[i-'0'-1] = LoadTexture(file_path);
+    }
+    srand(time(NULL));
 }
 
 void interface_close() {
@@ -123,7 +138,9 @@ void interface_draw_frame(State state) {
         if (object->type == BULLET) {
             DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
-            DrawCircleLines(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
+            DrawTextureEx(asteroids[rand() % 8], (Vector2){object->position.x-sx+width/2, -object->position.y +sy+height/2},
+                                                 0, 
+                                                 object->size / ASTEROID_MAX_SIZE, WHITE);
         }
        
     }

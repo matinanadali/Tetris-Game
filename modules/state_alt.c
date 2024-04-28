@@ -166,27 +166,31 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 }
 
 
+
 // Ενημερώνει την κατάσταση του διαστημοπλοίου
-void spaceship_update(Object spaceship, KeyState keys, double speed_factor) {
-	//περιστροφή διαστημοπλοίου
+void spaceship_update(Object spaceship, KeyState keys, State state) {
+	// Μετατόπιση διαστημοπλοίου
+	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, state->speed_factor));
+
+	if (keys->up) {  // Eπιτάχυνση διαστημοπλοίου
+		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
+		spaceship->speed = vec2_add(spaceship->speed, acceleration);
+	} else {        // Eπιβράδυνση διαστημοπλοίου
+		Vector2 initial_speed = state->info.spaceship->speed;
+		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
+		spaceship->speed = vec2_add(spaceship->speed, slowdown);
+
+		// Η επιβράδυνση του διαστημοπλοίου μειώνει το μέτρο της ταχύτητας αλλά δεν πρέπει να αλλάζει την κατεύθυνσή της
+		// Αν η νέα ταχύτητα δεν έχει την ίδια κατεύθυνση με την αρχική, μηδενίζεται
+		if (!(initial_speed.x * spaceship->speed.x > 0 || initial_speed.y * spaceship->speed.y > 0)) {
+			spaceship->speed = (Vector2){0,0};
+		}
+	}
+
+	// Περιστροφή διαστημοπλοίου
 	if (keys->left || keys->right) {
 		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
 		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
-	}
-
-	// Μετατόπιση διαστημοπλοίου
-	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, speed_factor));
-	
-	if (keys->up) {  //επιτάχυνση διαστημοπλοίου
-		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
-		spaceship->speed = vec2_add(spaceship->speed, acceleration);
-	} else {        //επιβράδυνση διαστημοπλοίου
-		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
-		spaceship->speed = vec2_add(spaceship->speed, slowdown);
-		//το διαστημόπλοιο ακινητοποιείται
-		if (spaceship->speed.x < 0 || spaceship->speed.y < 0) {
-			spaceship->speed = (Vector2){0,0};
-		}
 	}
 }
 
@@ -327,7 +331,7 @@ void state_update(State state, KeyState keys) {
     list_destroy(objects);
 
 	// Ενημέρωση κατάστασης διαστημοπλοίου
-	spaceship_update(state_info(state)->spaceship, keys, state->speed_factor);
+	spaceship_update(state_info(state)->spaceship, keys, state);
 
 	// Προσθήκη νέων αστεροειδών
 	num_asteroids_update(state);

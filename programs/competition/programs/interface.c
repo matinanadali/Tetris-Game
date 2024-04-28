@@ -39,7 +39,7 @@ void interface_init() {
 
     InitAudioDevice();    
     // Φόρτωση μουσικής
-    music = LoadMusicStream("../game/assets/cover.mp3");
+    music = LoadMusicStream("assets/cover.mp3");
     PlayMusicStream(music);
 
     spaceship = LoadTexture("assets/spaceship.png");
@@ -59,19 +59,6 @@ void interface_close() {
 	CloseAudioDevice();
 	CloseWindow();
 }
-
-// Μεταβιβάζει τα ορίσματα pointA, pointB και pointC στη συνάρτηση βιβλιοθήκης DrawTrianlgeLines
-// με τη σωστή σειρά (counter-clockwise)
-void DrawTriangleLinesHelper(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
-    double slope1 = (pointB.y - pointA.y) * (pointC.x - pointB.x);
-    double slope2 = (pointC.y - pointB.y) * (pointB.x - pointA.x);
-    if (slope1 > slope2) {
-        DrawTriangleLines(pointA, pointB, pointC, WHITE);
-    }
-    else {
-        DrawTriangleLines(pointA, pointC, pointB, WHITE);
-    }
-} 
 
 float radians_to_degrees(double angle_in_radians) {
     return 180 * angle_in_radians / PI;
@@ -125,7 +112,7 @@ void interface_draw_frame(State state) {
     // Ορθογώνιο μέσα στο οποίο τα αντικείμενα είναι ορατά
     Vector2 top_left = (Vector2){sx-width/2, sy+height/2};
     Vector2 bottom_right = (Vector2){sx+width/2, sy-height/2};
-
+return;
     // Λίστα ορατών αντικειμένων
     List objects = state_objects(state, top_left, bottom_right);
 
@@ -138,9 +125,10 @@ void interface_draw_frame(State state) {
         if (object->type == BULLET) {
             DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
-            DrawTextureEx(asteroids[rand() % 8], (Vector2){object->position.x-sx+width/2, -object->position.y +sy+height/2},
-                                                 0, 
-                                                 object->size / ASTEROID_MAX_SIZE, WHITE);
+            DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
+            // DrawTextureEx(asteroids[object->asteroid_type], (Vector2){object->position.x-sx+width/2, -object->position.y +sy+height/2},
+            //                                      0, 
+            //                                      object->size / ASTEROID_MAX_SIZE, WHITE);
         }
        
     }

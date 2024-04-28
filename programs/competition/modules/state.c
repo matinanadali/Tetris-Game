@@ -7,11 +7,11 @@
 #include "set_utils.h"
 #include "math.h"
 #include <stdio.h>
-#define INF 9999999999L
 
 // Οι ολοκληρωμένες πληροφορίες της κατάστασης του παιχνιδιού.
 // Ο τύπος State είναι pointer σε αυτό το struct, αλλά το ίδιο το struct
 // δεν είναι ορατό στον χρήστη.
+#define INF 9999999999L
 struct state {
 	Set asteroids;			// Περιέχει τους αστεροειδείς
 	Set bullets; 			// Περιέχει τις σφαίρες
@@ -20,6 +20,22 @@ struct state {
 	float speed_factor;		// Πολλαπλασιαστής ταχύτητς (1 = κανονική ταχύτητα, 2 = διπλάσια, κλπ)
 };
 
+// Δημιουργεί και επιστρέφει ένα αντικείμενο
+static Object create_object(ObjectType type, int asteroid_type, Vector2 position, Vector2 speed, Vector2 orientation, double size) {
+	Object obj = malloc(sizeof(*obj));
+	obj->type = type;
+	obj->asteroid_type = asteroid_type;
+	obj->position = position;
+	obj->speed = speed;
+	obj->orientation = orientation;
+	obj->size = size;
+	return obj;
+}
+
+// Επιστρέφει έναν τυχαίο πραγματικό αριθμό στο διάστημα [min,max]
+static double randf(double min, double max) {
+	return min + (double)rand() / RAND_MAX * (max - min);
+}
 
 // Προσθέτει num αστεροειδείς στην πίστα (η οποία μπορεί να περιέχει ήδη αντικείμενα).
 //
@@ -52,7 +68,7 @@ static void add_asteroids(State state, int num) {
 
 		Object asteroid = create_object(
 			ASTEROID,
-            rand() % 8;                                     // τυχαίος τύπος αστεροειδή από τους 8 διαθέσιμους
+			rand() % 8,										// τυχαίος τύπος αστεροειδούς από τους 8 διαθέσιμους
 			position,
 			speed,
 			(Vector2){0, 0},								// δεν χρησιμοποιείται για αστεροειδείς
@@ -69,8 +85,8 @@ int compare(Pointer a, Pointer b) {
     if (object_a->position.x > object_b->position.x) return -1;
     return 0;
 }
-
 // Δημιουργεί και επιστρέφει την αρχική κατάσταση του παιχνιδιού
+
 State state_create() {
 	// Δημιουργία του state
 	State state = malloc(sizeof(*state));
@@ -88,7 +104,7 @@ State state_create() {
 	// Δημιουργούμε το διαστημόπλοιο
 	state->info.spaceship = create_object(
 		SPACESHIP,
-        -1,                         // τύπος αστεροειδή: χρησιμοποιείται μόνο για αστεοειδείς
+		-1,							// τύπος αστεροειδή: μόνο για αστεροειδείς
 		(Vector2){0, 0},			// αρχική θέση στην αρχή των αξόνων
 		(Vector2){0, 0},			// μηδενική αρχική ταχύτητα
 		(Vector2){0, 1},			// κοιτάει προς τα πάνω
@@ -100,6 +116,17 @@ State state_create() {
 
 	return state;
 }
+
+
+// Μεταβάλλει το σκορ του state κατά points πόντους
+// Αν το τελικό σκορ προκύψει αρνητικό, μηδενίζεται
+void score_update(State state, int points) {
+	state->info.score += points;
+	if (state->info.score < 0) {
+		state->info.score = 0;
+	}
+}
+
 
 // Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
 StateInfo state_info(State state) {
@@ -141,18 +168,42 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 	return objects;
 }
 
-// Μεταβάλλει το σκορ του state κατά points πόντους
-// Αν το τελικό σκορ προκύψει αρνητικό, μηδενίζεται
-void score_update(State state, int points) {
-	state->info.score += points;
-	if (state->info.score < 0) {
-		state->info.score = 0;
+
+// Ενημερώνει την κατάσταση του διαστημοπλοίου
+void spaceship_update(Object spaceship, KeyState keys, State state) {
+	// Μετατόπιση διαστημοπλοίου
+	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, state->speed_factor));
+
+	if (keys->up) {  // Eπιτάχυνση διαστημοπλοίου
+		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
+		spaceship->speed = vec2_add(spaceship->speed, acceleration);
+	} else {        // Eπιβράδυνση διαστημοπλοίου
+		Vector2 initial_speed = state->info.spaceship->speed;
+		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
+		spaceship->speed = vec2_add(spaceship->speed, slowdown);
+
+		// Η επιβράδυνση του διαστημοπλοίου μειώνει το μέτρο της ταχύτητας αλλά δεν πρέπει να αλλάζει την κατεύθυνσή της
+		// Αν η νέα ταχύτητα δεν έχει την ίδια κατεύθυνση με την αρχική, μηδενίζεται
+		if (!(initial_speed.x * spaceship->speed.x > 0 || initial_speed.y * spaceship->speed.y > 0)) {
+			spaceship->speed = (Vector2){0,0};
+		}
 	}
+
+	// Περιστροφή διαστημοπλοίου
+	if (keys->left || keys->right) {
+		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
+		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
+	}
+}
+
+// Ενημερώνει την κατάσταση του αντικειμένου (αστεροειδούς-σφαίρας) object
+void object_update(Object object, int speed_factor) {
+	// Μετατόπιση αντικειμένου
+	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
 }
 
 // Προσθέτει αστεροειδείς ώστε να υπάρχουν τουλάχιστον ASTEROID_NUM κοντά στο διαστημόπλοιο
 void num_asteroids_update(State state) {
-
     Vector2 top_left = (Vector2){-ASTEROID_MAX_DIST + state->info.spaceship->position.x, +ASTEROID_MAX_DIST + state->info.spaceship->position.y};
 	Vector2 bottom_right = (Vector2){+ASTEROID_MAX_DIST + state->info.spaceship->position.x, -ASTEROID_MAX_DIST + state->info.spaceship->position.y};
     List asteroids_near_spaceship = state_objects_by_type(state, top_left, bottom_right, ASTEROID);
@@ -199,7 +250,7 @@ Object create_new_asteroid(double size, double speed_value, Vector2 spaceship_po
 
 	Object new_asteroid = create_object(
 		ASTEROID,
-        rand() % 8,
+		rand() % 8,
 		position,
 		speed,
 		(Vector2){0,0},
@@ -225,7 +276,7 @@ void handle_bullet_asteroid_collision(State state, Object asteroid) {
 
 void handle_asteroid_spaceship_collision(State state, Object asteroid) {
 	set_remove(state->asteroids, asteroid);
-	score_update(state, -state->info.score / 2);
+	score_update(state, -state->info.score/2);
 }
 
 // Εντοπίζει και διαχειρίζεται τις συγκρούσεις αστεροειδούς-διαστημοπλοίου και αστεροειδούς-σφαίρας
@@ -283,11 +334,11 @@ void state_update(State state, KeyState keys) {
     list_destroy(objects);
 
 	// Ενημέρωση κατάστασης διαστημοπλοίου
-	spaceship_update(state_info(state)->spaceship, keys, state->speed_factor);
+	spaceship_update(state_info(state)->spaceship, keys, state);
 
 	// Προσθήκη νέων αστεροειδών
 	num_asteroids_update(state);
-	
+
 	// Μείωση του αριθμού frames που απαιτούνται για να επιτραπεί η επόμενη σφαίρα
 	state->next_bullet--;
 

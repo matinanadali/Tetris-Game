@@ -1,7 +1,7 @@
 # paths
 LIB = ../../../lib
 INCLUDE = ../include
-MODULES = ../modules
+
 # compiler
 CC = gcc
 
@@ -10,10 +10,10 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = game.o $(MODULES)/state.o $(MODULES)/vec2.o $(MODULES)/set_utils.o ./interface.o $(LIB)/k08.a $(LIB)/libraylib.a
+OBJS = state.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a
 
 # Το εκτελέσιμο πρόγραμμα
-EXEC = game
+EXEC = state
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =
@@ -22,18 +22,19 @@ ARGS =
 include $(LIB)/libraylib.mk
 
 
+all: $(EXEC) $(ALT_EXEC)
+
+# Αρχική υλοποίηση
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
-
-# Για να φτιάξουμε τα k08.a/libraylib.a τρέχουμε το make στο lib directory.
-$(LIB)/%.a:
-	$(MAKE) -C $(LIB) $*.a
 
 clean:
 	rm -f $(OBJS) $(EXEC)
 
+# Εκτέλεση προγράμματος
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
 
-valgrind: $(EXEC)
-	valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all ./$(EXEC) $(ARGS)
+# Για να φτιάξουμε τα k08.a/libraylib.a τρέχουμε το make στο lib directory.
+$(LIB)/%.a:
+	$(MAKE) -C $(LIB) $*.a

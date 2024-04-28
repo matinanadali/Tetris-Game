@@ -21,7 +21,7 @@
 Music music;
 Texture spaceship;
 Texture moving_effect;
-Texture asteroids[8];
+Texture asteroids;
 
 static bool double_equal(double a, double b) {
 	return fabs(a-b) < 1e-6;
@@ -32,6 +32,7 @@ static bool vec2_equal(Vector2 a, Vector2 b) {
 	return double_equal(a.x, b.x) && double_equal(a.y, b.y);
 }
 
+
 void interface_init() {
 	// Αρχικοποίηση του παραθύρου
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "game");
@@ -41,18 +42,9 @@ void interface_init() {
     // Φόρτωση μουσικής
     music = LoadMusicStream("assets/cover.mp3");
     PlayMusicStream(music);
-
     spaceship = LoadTexture("assets/spaceship.png");
     moving_effect = LoadTexture("assets/moving_effect.png");
-    for (char i = '1'; i <= '8'; i++) {
-        char file_path[100] = "assets/meteor";
-        char number[2];
-        number[0] = i;
-        strcat(file_path, number);
-        strcat(file_path, ".png");
-        asteroids[i-'0'-1] = LoadTexture(file_path);
-    }
-    srand(time(NULL));
+    asteroids = LoadTexture("assets/asteroids.png");
 }
 
 void interface_close() {
@@ -77,14 +69,13 @@ void interface_draw_frame(State state) {
 
     // Η γωνία που σχηματίζει το διάνυσμα orientation με τον θετικό ημιάξονα x
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
-  
+
     DrawTexturePro(spaceship, (Rectangle){0, 0, SPACESHIP_WIDTH, SPACESHIP_HEIGHT}, 
                               (Rectangle){width/2, height/2, SPACESHIP_WIDTH, SPACESHIP_HEIGHT}, 
                               (Vector2){SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2},
                               -radians_to_degrees(angle), WHITE);
-
-    Vector2 speed = state_info(state)->spaceship->speed;
-    Vector2 top_left_corner = (Vector2){-SPACESHIP_WIDTH/2, -SPACESHIP_HEIGHT/2 + 7};
+     Vector2 speed = state_info(state)->spaceship->speed;
+     Vector2 top_left_corner = (Vector2){-SPACESHIP_WIDTH/2, -SPACESHIP_HEIGHT/2 + 7};
     top_left_corner = vec2_rotate(top_left_corner, -angle);
     top_left_corner = vec2_add(top_left_corner, (Vector2){width/2, height/2});
 
@@ -112,7 +103,7 @@ void interface_draw_frame(State state) {
     // Ορθογώνιο μέσα στο οποίο τα αντικείμενα είναι ορατά
     Vector2 top_left = (Vector2){sx-width/2, sy+height/2};
     Vector2 bottom_right = (Vector2){sx+width/2, sy-height/2};
-return;
+
     // Λίστα ορατών αντικειμένων
     List objects = state_objects(state, top_left, bottom_right);
 
@@ -125,10 +116,10 @@ return;
         if (object->type == BULLET) {
             DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
-            DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
-            // DrawTextureEx(asteroids[object->asteroid_type], (Vector2){object->position.x-sx+width/2, -object->position.y +sy+height/2},
-            //                                      0, 
-            //                                      object->size / ASTEROID_MAX_SIZE, WHITE);
+            DrawTexturePro(asteroids,(Rectangle){object->asteroid_type*ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT},
+                                    (Rectangle){object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, object->size},
+                                    (Vector2){0,0}, 
+                                    0, WHITE);
         }
        
     }

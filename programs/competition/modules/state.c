@@ -21,10 +21,9 @@ struct state {
 };
 
 // Δημιουργεί και επιστρέφει ένα αντικείμενο
-static Object create_object(ObjectType type, int asteroid_type, Vector2 position, Vector2 speed, Vector2 orientation, double size) {
+static Object create_object(ObjectType type, Vector2 position, Vector2 speed, Vector2 orientation, double size) {
 	Object obj = malloc(sizeof(*obj));
 	obj->type = type;
-	obj->asteroid_type = asteroid_type;
 	obj->position = position;
 	obj->speed = speed;
 	obj->orientation = orientation;
@@ -68,7 +67,6 @@ static void add_asteroids(State state, int num) {
 
 		Object asteroid = create_object(
 			ASTEROID,
-			rand() % 8,										// τυχαίος τύπος αστεροειδούς από τους 8 διαθέσιμους
 			position,
 			speed,
 			(Vector2){0, 0},								// δεν χρησιμοποιείται για αστεροειδείς
@@ -104,7 +102,6 @@ State state_create() {
 	// Δημιουργούμε το διαστημόπλοιο
 	state->info.spaceship = create_object(
 		SPACESHIP,
-		-1,							// τύπος αστεροειδή: μόνο για αστεροειδείς
 		(Vector2){0, 0},			// αρχική θέση στην αρχή των αξόνων
 		(Vector2){0, 0},			// μηδενική αρχική ταχύτητα
 		(Vector2){0, 1},			// κοιτάει προς τα πάνω
@@ -169,6 +166,7 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 }
 
 
+
 // Ενημερώνει την κατάσταση του διαστημοπλοίου
 void spaceship_update(Object spaceship, KeyState keys, State state) {
 	// Μετατόπιση διαστημοπλοίου
@@ -222,7 +220,7 @@ void add_bullet(State state) {
 	// Η σφαίρα αρχικά βρίσκεται στη θέση του διαστημοπλοίου
 	Vector2 position = spaceship->position;
 
-	set_insert(state->bullets, create_object(BULLET, -1, position, speed, (Vector2){0, 0}, BULLET_SIZE));
+	set_insert(state->bullets, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
 	state->next_bullet = BULLET_DELAY;
 }
 
@@ -250,7 +248,6 @@ Object create_new_asteroid(double size, double speed_value, Vector2 spaceship_po
 
 	Object new_asteroid = create_object(
 		ASTEROID,
-		rand() % 8,
 		position,
 		speed,
 		(Vector2){0,0},
@@ -338,7 +335,7 @@ void state_update(State state, KeyState keys) {
 
 	// Προσθήκη νέων αστεροειδών
 	num_asteroids_update(state);
-
+	
 	// Μείωση του αριθμού frames που απαιτούνται για να επιτραπεί η επόμενη σφαίρα
 	state->next_bullet--;
 

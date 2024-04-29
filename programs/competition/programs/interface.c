@@ -15,8 +15,8 @@
 #define MOVING_WIDTH 79
 #define MOVING_HEIGHT 10
 
-#define ASTEROID_WIDTH 89
-#define ASTEROID_HEIGHT 75
+#define ASTEROID_WIDTH 90
+#define ASTEROID_HEIGHT 90
 
 Music music;
 Texture spaceship;
@@ -40,11 +40,11 @@ void interface_init() {
 
     InitAudioDevice();    
     // Φόρτωση μουσικής
-    music = LoadMusicStream("assets/cover.mp3");
+    music = LoadMusicStream("programs/assets/cover.mp3");
     PlayMusicStream(music);
-    spaceship = LoadTexture("assets/spaceship.png");
-    moving_effect = LoadTexture("assets/moving_effect.png");
-    asteroids = LoadTexture("assets/asteroids.png");
+    spaceship = LoadTexture("programs/assets/spaceship.png");
+    moving_effect = LoadTexture("programs/assets/moving_effect.png");
+    asteroids = LoadTexture("programs/assets/asteroids.png");
 }
 
 void interface_close() {
@@ -116,7 +116,7 @@ void interface_draw_frame(State state) {
         if (object->type == BULLET) {
             DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
-            DrawTexturePro(asteroids,(Rectangle){object->asteroid_type*ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT},
+            DrawTexturePro(asteroids,(Rectangle){(object->asteroid_type)*ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT},
                                     (Rectangle){object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, object->size},
                                     (Vector2){0,0}, 
                                     0, WHITE);

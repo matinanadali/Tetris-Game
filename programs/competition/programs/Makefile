@@ -1,8 +1,8 @@
 # paths
-LIB = ../../lib
-INCLUDE = ./include
-MODULES = ./modules
-PROGRAMS = ./programs
+LIB = ../../../lib
+INCLUDE = ../include
+MODULES = ../modules
+
 # compiler
 CC = gcc
 
@@ -11,7 +11,7 @@ CFLAGS = -Wall -Werror -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = $(PROGRAMS)/game.o $(MODULES)/state.o $(MODULES)/vec2.o $(MODULES)/set_utils.o $(PROGRAMS)/interface.o $(LIB)/k08.a $(LIB)/libraylib.a
+OBJS = game.o $(MODULES)/state.o $(MODULES)/vec2.o $(MODULES)/set_utils.o ./interface.o $(LIB)/k08.a $(LIB)/libraylib.a
 
 # Το εκτελέσιμο πρόγραμμα
 EXEC = game

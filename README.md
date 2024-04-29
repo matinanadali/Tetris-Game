@@ -34,8 +34,8 @@ make run
 Προσοχή! Το παιχνίδι είναι συμβατό μόνο με το λειτουργικό σύστημα Linux. Η εκτέλεση του σε άλλα λειτουργικά συστήματα πιθανόν να έχει επιπτώσεις στην απόδοσή των γραφικών του.
 
 #### Τεχνολογίες που χρησιμοποιήθηκαν
-<img width="75px" src="https://github.com/chatziko-k08/2024-project-1-matinanadali/tree/master/assets/c_icon.png" alt="C Icon" />
-<img width="75px" src="https://github.com/chatziko-k08/2024-project-1-matinanadali/tree/master/assets/raylib_icon.png" alt="Raylib Icon" />
+<img width="75px" src="https://github.com/chatziko-k08/2024-project-1-matinanadali/assets/c_icon.png" alt="C Icon" />
+<img width="75px" src="https://github.com/chatziko-k08/2024-project-1-matinanadali/assets/raylib_icon.png" alt="Raylib Icon" />
 
 #### 1.  Αρχική υλοποίηση (με τη χρήση Vector)
 Στην αρχική υλοποίηση του παιχνιδιού

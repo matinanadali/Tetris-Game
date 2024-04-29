@@ -23,7 +23,7 @@ __Α.Μ.__: sdi2300137
 ### Documentation
 #### Περιγραφή παιχνιδιού
 Στο παιχνίδι αυτό ένα διαστημόπλοιο εξερευνεί το αχανές διάστημα, προσπαθώντας να αποφύγει αστεροειδείς που εμφανίζονται στο δρόμο του. Σκοπός του παιχνιδιού είναι το διαστημόπλοιο να ταξιδέψει όσο περισσότερο γίνεται, ελαχιστοποιώντας τον αριθμό των αστεροειδών που καταστρέφει. 
-![Game image]("https://github.com/chatziko-k08/2024-project-1-matinanadali/tree/master/assets/game_image.png?raw=true")
+![game image](https://github.com/chatziko-k08/2024-project-1-matinanadali/assets/140314761/a4da0127-1438-43da-81c7-9735459caa3c)
 
 
 #### Οδηγίες εγκατάστασης
@@ -36,8 +36,9 @@ make run
 Προσοχή! Το παιχνίδι είναι συμβατό μόνο με το λειτουργικό σύστημα Linux. Η εκτέλεση του σε άλλα λειτουργικά συστήματα πιθανόν να έχει επιπτώσεις στην απόδοσή των γραφικών του.
 
 #### Τεχνολογίες που χρησιμοποιήθηκαν
-![C icon]("https://github.com/chatziko-k08/2024-project-1-matinanadali/tree/master/assets/c_icon.png?raw=true")
-![Raylib icon]("https://github.com/chatziko-k08/2024-project-1-matinanadali/tree/master/assets/raylib_icon.png?raw=true")
+![c icon](https://github.com/chatziko-k08/2024-project-1-matinanadali/assets/140314761/4e3ed245-a33e-49fb-8a4c-d1f058d9c535)
+![raylib icon](https://github.com/chatziko-k08/2024-project-1-matinanadali/assets/140314761/cf9e245e-42f9-448c-9075-378066a76fb3)
+
 
 #### 1.  Αρχική υλοποίηση (με τη χρήση Vector)
 Στην αρχική υλοποίηση του παιχνιδιού

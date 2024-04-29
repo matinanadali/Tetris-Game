@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include "ADTSet.h"
 #include "ADTList.h"
@@ -164,8 +163,6 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
 	list_append(objects, bullets);
 	return objects;
 }
-
-
 
 // Ενημερώνει την κατάσταση του διαστημοπλοίου
 void spaceship_update(Object spaceship, KeyState keys, State state) {

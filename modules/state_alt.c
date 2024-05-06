@@ -198,7 +198,7 @@ void spaceship_update(Object spaceship, KeyState keys, State state) {
 void object_update(State state, Object object, int speed_factor) {
 	// Μετατόπιση αντικειμένου
 	Vector2 new_position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
-	Object new_object = create_object(object->type, object->speed, new_position, object->orientation, object->size);
+	Object new_object = create_object(object->type, new_position, object->speed, object->orientation, object->size);
 
 	if (object->type == ASTEROID) {
 		set_remove(state->asteroids, object);

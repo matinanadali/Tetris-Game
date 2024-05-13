@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "ADTSet.h"
 #include "ADTList.h"
-#include "state_comp.h"
+#include "state.h"
 #include "vec2.h"
 #include "set_utils.h"
 #include "math.h"

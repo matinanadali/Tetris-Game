@@ -1,4 +1,4 @@
-#include "state.h"
+#include "state_comp.h"
 // Αρχικοποιεί το interface του παιχνιδιού
 void interface_init();
 

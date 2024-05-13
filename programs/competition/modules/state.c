@@ -1,8 +1,7 @@
-
 #include <stdlib.h>
 #include "ADTSet.h"
 #include "ADTList.h"
-#include "state.h"
+#include "state_comp.h"
 #include "vec2.h"
 #include "set_utils.h"
 #include "math.h"
@@ -78,12 +77,15 @@ static void add_asteroids(State state, int num) {
 	}
 }
 
+// Compare function του set
+// Τα αντικείμενα ταξινομούνται με βάση τις x και έπειτα με βάση τις y συντεταγμένες τους
+// Αν οι θέσεις τους ταυτίζονται, τα αντικείμενα ταξινομούνται με βάση τις τιμές των δεικτών σε αυτά
 int compare(Pointer a, Pointer b) {
     Object object_a = a;
     Object object_b = b;
     if (object_a->position.x < object_b->position.x) return 1;
     if (object_a->position.x > object_b->position.x) return -1;
-    return 0;
+    return a < b;
 }
 // Δημιουργεί και επιστρέφει την αρχική κατάσταση του παιχνιδιού
 
@@ -198,9 +200,19 @@ void spaceship_update(Object spaceship, KeyState keys, State state) {
 }
 
 // Ενημερώνει την κατάσταση του αντικειμένου (αστεροειδούς-σφαίρας) object
-void object_update(Object object, int speed_factor) {
+void object_update(State state, Object object, int speed_factor) {
 	// Μετατόπιση αντικειμένου
-	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
+	Vector2 new_position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
+	Object new_object = create_object(object->type, object->asteroid_type, new_position, object->speed, object->orientation, object->size);
+
+	if (object->type == ASTEROID) {
+		set_remove(state->asteroids, object);
+		set_insert(state->asteroids, new_object);
+	} else {
+		set_remove(state->bullets, object);
+		set_insert(state->bullets, new_object);
+	}
+	
 }
 
 // Προσθέτει αστεροειδείς ώστε να υπάρχουν τουλάχιστον ASTEROID_NUM κοντά στο διαστημόπλοιο
@@ -330,7 +342,7 @@ void state_update(State state, KeyState keys) {
     List objects= state_objects(state, top_left, bottom_right);
 	for (ListNode node = list_first(objects); node != LIST_EOF; node = list_next(objects, node)) {
 		Object current_object = list_node_value(objects, node);
-		object_update(current_object, state->speed_factor);
+		object_update(state, current_object, state->speed_factor);
 	}
     list_destroy(objects);
 
@@ -349,7 +361,7 @@ void state_update(State state, KeyState keys) {
 	}
 
 	// Αύξηση της ταχύτητας παιχνιδιού αν το σκορ φτάσει σε κάποιο πολλαπλάσιο του 100
-	if (state != 0 && state->info.score % 100 == 0) {
+	if (state->info.score != 0 && state->info.score % 100 == 0) {
 		state->speed_factor *= 1.1;
 	}
 	

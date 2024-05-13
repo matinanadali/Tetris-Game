@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include "ADTList.h"
-#include "state.h"
+#include "state_comp.h"
 #include "interface.h"
 #include "vec2.h"
 #include <math.h>
@@ -74,8 +74,8 @@ void interface_draw_frame(State state) {
                               (Rectangle){width/2, height/2, SPACESHIP_WIDTH, SPACESHIP_HEIGHT}, 
                               (Vector2){SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2},
                               -radians_to_degrees(angle), WHITE);
-     Vector2 speed = state_info(state)->spaceship->speed;
-     Vector2 top_left_corner = (Vector2){-SPACESHIP_WIDTH/2, -SPACESHIP_HEIGHT/2 + 7};
+    Vector2 speed = state_info(state)->spaceship->speed;
+    Vector2 top_left_corner = (Vector2){-SPACESHIP_WIDTH/2, -SPACESHIP_HEIGHT/2 + 7};
     top_left_corner = vec2_rotate(top_left_corner, -angle);
     top_left_corner = vec2_add(top_left_corner, (Vector2){width/2, height/2});
 
@@ -117,7 +117,7 @@ void interface_draw_frame(State state) {
             DrawCircle(object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, WHITE);
         } else {
             DrawTexturePro(asteroids,(Rectangle){(object->asteroid_type)*ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT},
-                                    (Rectangle){object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, object->size},
+                                    (Rectangle){object->position.x-sx+width/2, -object->position.y +sy+height/2, object->size, object->size * 1.5},
                                     (Vector2){0,0}, 
                                     0, WHITE);
         }

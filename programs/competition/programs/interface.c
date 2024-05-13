@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include "ADTList.h"
-#include "state_comp.h"
+#include "state.h"
 #include "interface.h"
 #include "vec2.h"
 #include <math.h>

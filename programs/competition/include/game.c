@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include "raylib.h"
-
 #include "interface.h"
-#include "state.h"
+#include "state_competition.h"
 
 State state;
 
@@ -15,10 +14,16 @@ void update_and_draw() {
         IsKeyDown(KEY_ENTER),
         IsKeyDown(KEY_SPACE),
         IsKeyDown(KEY_N),
-        IsKeyDown(KEY_P)
+        IsKeyDown(KEY_P),
+    };
+
+    Vector2 mousePoint = GetMousePosition();
+    struct button_state buttons = (struct button_state){
+        CheckCollisionPointRec(mousePoint, play_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+        CheckCollisionPointRec(mousePoint, rules_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)
     };
     
-	state_update(state, &keys);
+	state_update(state, &keys, &buttons);
 	interface_draw_frame(state);
 }
 

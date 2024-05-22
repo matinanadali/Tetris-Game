@@ -1,8 +1,8 @@
 # paths
-LIB = ../../lib
-INCLUDE = -I../../include -I./include
-MODULES = ../../modules
-INTERFACE = ./interface
+LIB = ../../../lib
+INCLUDE = -I../../../include -I../include
+MODULES = ../../../modules
+INTERFACE = ../interface
 
 # compiler
 CC = gcc
@@ -12,10 +12,9 @@ CFLAGS = -Wall -Werror -g $(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = game.o state.o ./interface.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a $(INTERFACE)/welcome_screen.o $(INTERFACE)/game_screen.o
-
+OBJS = game_screen.o welcome_screen.o ../state.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a 
 # Εκτελέσιμα αρχεία
-EXEC = game
+EXEC =
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =

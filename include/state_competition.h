@@ -33,7 +33,6 @@ typedef enum {
 // Πληροφορίες για κάθε αντικείμενο
 typedef struct object {
 	ObjectType type;			// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
-	int asteroid_type;
 	Vector2 position;			// Θέση
 	Vector2 speed;				// Ταχύτητα (pixels/frame)
 	double size;				// Μέγεθος (pixels)
@@ -43,6 +42,7 @@ typedef struct object {
 // Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
 typedef struct state_info {
 	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
+	bool welcome;
 	bool paused;					// true αν το παιχνίδι είναι paused
 	int score;						// το τρέχον σκορ
 }* StateInfo;
@@ -57,6 +57,13 @@ typedef struct key_state {
 	bool n;
 	bool p;
 }* KeyState;
+
+
+// Πληοροφορίες για το ποια κουμπιά της αρχικής οθόνης έχουν πατηθεί
+typedef struct button_state {
+	bool play;
+	bool rules;
+} *ButtonState;
 
 // Η κατάσταση του παιχνιδιού (handle)
 typedef struct state* State;
@@ -79,7 +86,7 @@ List state_objects(State state, Vector2 top_left, Vector2 bottom_right);
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 
-void state_update(State state, KeyState keys);
+void state_update(State state, KeyState keys, ButtonState buttons);
 
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη.
 

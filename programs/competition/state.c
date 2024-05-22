@@ -77,7 +77,7 @@ State state_create() {
 	state->speed_factor = 1;				// Κανονική ταχύτητα
 	state->next_bullet = 0;					// Σφαίρα επιτρέπεται αμέσως
 	state->info.score = 0;				// Αρχικό σκορ 0
-	state->info.welcome = true;			
+	state->info.screen_state = WELCOME;			
 
 	// Δημιουργούμε το vector των αντικειμένων, και προσθέτουμε αντικείμενα
 	state->objects = vector_create(0, NULL);
@@ -333,10 +333,15 @@ void handle_collisions(State state) {
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys, ButtonState buttons) {
-	if (state->info.welcome && buttons->play) {
-		state->info.welcome = false;
-	} 
-	if (state->info.welcome) return;
+	if (buttons->play) {
+		state->info.screen_state = GAME;
+	} else if (buttons->rules) {
+		state->info.screen_state = RULES;
+		return;
+	} else if (buttons->home) {
+		state->info.screen_state = WELCOME;
+		return;
+	}
 
 	// Αλλαγή κατάστασης του παιχνιδιού (paused - not paused)
 	if (keys->p) {

@@ -1,15 +1,24 @@
 #include "state_competition.h"
-#define BUTTON_WIDTH 122
-#define BUTTON_HEIGHT 54
+#include "raylib.h"
+#include "ADTList.h"
+#include "vec2.h"
+#include <math.h>
+#include <stdio.h>
+
+#define BUTTON_WIDTH 162
+#define BUTTON_HEIGHT 70
 #define MID_WIDTH ( SCREEN_WIDTH / 2 )
 #define MID_HEIGHT ( SCREEN_HEIGHT / 2 )
 
 extern Rectangle play_button_bounds;
 extern Rectangle rules_button_bounds;
+extern Rectangle home_button_bounds;
 extern Texture spaceship;
 extern Texture background;
 extern Texture play_button;
 extern Texture rules_button;
+extern Texture home_button;
+extern Font font;
 
 // Αρχικοποιεί το interface του παιχνιδιού
 void interface_init();

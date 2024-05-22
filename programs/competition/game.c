@@ -20,7 +20,8 @@ void update_and_draw() {
     Vector2 mousePoint = GetMousePosition();
     struct button_state buttons = (struct button_state){
         CheckCollisionPointRec(mousePoint, play_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON),
-        CheckCollisionPointRec(mousePoint, rules_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)
+        CheckCollisionPointRec(mousePoint, rules_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+        CheckCollisionPointRec(mousePoint, home_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)
     };
     
 	state_update(state, &keys, &buttons);

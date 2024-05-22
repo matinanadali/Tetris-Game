@@ -1,5 +1,4 @@
 #include "welcome_screen.h"
-
 float scrolling_back = 0.0f;
 void draw_welcome_screen(State state) {
     scrolling_back += 0.2f;

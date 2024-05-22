@@ -1,22 +1,20 @@
-#include "raylib.h"
-#include "ADTList.h"
-#include "state_competition.h"
+#include "interface.h"
 #include "welcome_screen.h"
 #include "game_screen.h"
-#include "interface.h"
-#include "vec2.h"
-#include <math.h>
-#include <stdio.h>
+#include "rules_screen.h"
 
 Music music;
 
 
-Rectangle play_button_bounds = {40, SCREEN_HEIGHT / 2, BUTTON_WIDTH + 80, BUTTON_HEIGHT + SCREEN_HEIGHT/ 2};
-Rectangle rules_button_bounds = {80 + BUTTON_WIDTH, SCREEN_HEIGHT / 2, 2*BUTTON_WIDTH, BUTTON_HEIGHT + SCREEN_HEIGHT / 2};
+Rectangle play_button_bounds = {40, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Rectangle rules_button_bounds = {80 + BUTTON_WIDTH, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Rectangle home_button_bounds = {MID_WIDTH - (BUTTON_WIDTH / 2), SCREEN_HEIGHT - BUTTON_HEIGHT - 80, BUTTON_WIDTH,  BUTTON_HEIGHT};
 Texture spaceship;
 Texture background;
 Texture rules_button;
 Texture play_button;
+Texture home_button;
+Font font;
 
 
 void interface_init() {
@@ -28,6 +26,8 @@ void interface_init() {
     background = LoadTexture("assets/background.png");
     rules_button = LoadTexture("assets/rules_button.png");
     play_button = LoadTexture("assets/play_button.png");
+    home_button = LoadTexture("assets/home_button.png");
+    font = LoadFont("assets/ARCADE_N.TTF");
    
 
     InitAudioDevice();    
@@ -49,10 +49,12 @@ void interface_draw_frame(State state) {
     // Καθαρισμός, θα τα σχεδιάσουμε όλα από την αρχή
 	ClearBackground(BLACK);
 
-    if (state_info(state)->welcome) {
+    if (state_info(state)->screen_state == WELCOME) {
         draw_welcome_screen(state);
-    } else {
+    } else if (state_info(state)->screen_state == GAME) {
         draw_game_screen(state);
+    } else {
+        draw_rules_screen(state);
     }
 	
     EndDrawing();

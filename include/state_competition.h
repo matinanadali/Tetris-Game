@@ -30,6 +30,10 @@ typedef enum {
 	IDLE, JUMPING, FALLING, MOVING_UP, MOVING_DOWN
 } VerticalMovement;
 
+typedef enum {
+	WELCOME, GAME, RULES
+} ScreenState;
+
 // Πληροφορίες για κάθε αντικείμενο
 typedef struct object {
 	ObjectType type;			// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
@@ -42,7 +46,7 @@ typedef struct object {
 // Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
 typedef struct state_info {
 	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
-	bool welcome;
+	ScreenState screen_state;
 	bool paused;					// true αν το παιχνίδι είναι paused
 	int score;						// το τρέχον σκορ
 }* StateInfo;
@@ -63,6 +67,7 @@ typedef struct key_state {
 typedef struct button_state {
 	bool play;
 	bool rules;
+	bool home;
 } *ButtonState;
 
 // Η κατάσταση του παιχνιδιού (handle)

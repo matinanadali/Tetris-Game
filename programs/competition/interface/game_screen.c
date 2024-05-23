@@ -1,4 +1,7 @@
 #include "game_screen.h"
+#define BULLET_LEFT_WIDTH 40
+#define LIFE_WIDTH 40
+const Color bullet_color = (Color){165,58,57,232};
 void draw_background(State state) {
     int sx = state_info(state)->spaceship->position.x;
     int sy = state_info(state)->spaceship->position.y;
@@ -63,9 +66,11 @@ void draw_objects(State state) {
         // Επειδή η βιβλιοθήκη θεωρεί ότι τα y αυξάνονται προς τα κάτω, 
         // αλλάζουμε πρόσημο στις y συντεταγμένες των αντικειμένων
         if (object->type == BULLET) {
-            DrawCircle(object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, object->size, WHITE);
-        } else {
+            DrawCircle(object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, object->size, bullet_color);
+        } else if (object->type == ASTEROID) {
             draw_asteroid(sx, sy, object);
+        } else {
+            DrawTexture(star, object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, WHITE);
         }
        
     }
@@ -75,12 +80,28 @@ void draw_objects(State state) {
 }
 
 void play_sounds(State state) {
-    if (state_info(state)->bullet_thrown) {
+    if (state_info(state)->events->bullet_thrown) {
         PlaySound(bullet_sound);
     }
-    if (state_info(state)->collision_occured) {
+    if (state_info(state)->events->collision) {
         PlaySound(collision_sound);
     } 
+}
+
+void draw_game_stats(State state) {
+    int i;
+    for (i = 0; i < max(5, state_info(state)->stats->bullets_left); i++) {
+        DrawTexture(bullet_left, i * BULLET_LEFT_WIDTH + 40, 40, WHITE);
+    }
+
+    if (state_info(state)->events->bullet_added != 0) {
+        DrawTextEx(font, "+1!", (Vector2){i * BULLET_LEFT_WIDTH + 40, 30}, 40, 0, WHITE);
+    }
+
+    for (i = 0; i < max(5, state_info(state)->stats->lives); i++) {
+        DrawTexture(life, SCREEN_WIDTH - i * LIFE_WIDTH - 40, 40, WHITE);
+    }
+    DrawText(TextFormat("%d", state_info(state)->stats->score), MID_WIDTH, 40, 40, WHITE); 
 }
 
 void draw_game_screen(State state) {
@@ -88,8 +109,5 @@ void draw_game_screen(State state) {
     draw_spaceship(state);
     draw_objects(state);
     play_sounds(state);
-
-    // Σχεδιάζουμε το σκορ
-    DrawText(TextFormat("%04i", state_info(state)->score), 20, 20, 40, GRAY);
-	DrawFPS(SCREEN_WIDTH - 80, 0);
+    draw_game_stats(state);
 }

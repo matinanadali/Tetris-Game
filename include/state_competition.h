@@ -29,8 +29,14 @@
 #define MID_WIDTH ( SCREEN_WIDTH / 2 )
 #define MID_HEIGHT ( SCREEN_HEIGHT / 2 )
 
+#define INITIAL_LIVES 5
+#define INITIAL_BULLETS 3
+
+#define STAR_NUM 2
+#define STAR_SIZE 20
+
 typedef enum {
-	SPACESHIP, ASTEROID, BULLET
+	SPACESHIP, ASTEROID, BULLET, STAR
 } ObjectType;
 
 typedef enum {
@@ -52,6 +58,20 @@ typedef struct screen_state {
 	int frames_in_transition;
 } *ScreenState;
 
+typedef struct stats {
+	int bullets_left;
+	int lives;
+	int score;
+} *Stats;
+
+typedef struct events {
+	bool collision;
+	bool bullet_thrown;
+	bool star;
+	int bullet_added;
+} *Events;
+
+
 // Πληροφορίες για κάθε αντικείμενο
 typedef struct object {
 	ObjectType type;				// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
@@ -66,10 +86,9 @@ typedef struct object {
 typedef struct state_info {
 	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
 	ScreenState screen_state;		// Πληροφορίες για το σε ποια οθόνη βρισκόμαστε (welcome, transition, game, rules)
-	bool collision_occured;			
-	bool bullet_thrown;
+	Events events;
 	bool paused;					// true αν το παιχνίδι είναι paused
-	int score;						// το τρέχον σκορ
+	Stats stats;				
 }* StateInfo;
 
 // Πληροφορίες για το ποια πλήκτρα είναι πατημένα

@@ -49,12 +49,12 @@ void draw_moving_spaceship(State state) {
     int seconds_moving = state_info(state)->screen_state->frames_in_transition - 180;
     float speed = SCREEN_HEIGHT / 40.0;
 
-    DrawTextureEx(spaceship, (Vector2){3*MID_WIDTH/2-SPACESHIP_WIDTH/2, SCREEN_HEIGHT-speed*seconds_moving}, 0.0, 1.5, WHITE);
+    if (seconds_moving < 0) seconds_moving = 0;
+
+    DrawTextureEx(spaceship, (Vector2){3*MID_WIDTH/2-SPACESHIP_WIDTH/2, SCREEN_HEIGHT-200-speed*seconds_moving}, 0.0, 1.5, WHITE);
 }
 
 void draw_transition_screen(State state) {
     draw_counter_section(state);
-    if (state_info(state)->screen_state->frames_in_transition > 180) {
-        draw_moving_spaceship(state);
-    }
+    draw_moving_spaceship(state);
 }

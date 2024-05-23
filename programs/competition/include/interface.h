@@ -13,7 +13,6 @@
 #define MID_HEIGHT ( SCREEN_HEIGHT / 2 )
 #define ASTEROID_WIDTH 90
 #define ASTEROID_HEIGHT 90
-#define ASTEROID_SCALE_SIZE 30
 
 extern Rectangle play_button_bounds;
 extern Rectangle rules_button_bounds;

@@ -1,4 +1,15 @@
 #include "game_screen.h"
+void draw_background(State state) {
+    int sx = state_info(state)->spaceship->position.x;
+    int sy = state_info(state)->spaceship->position.y;
+    sx = sx % SCREEN_WIDTH;
+    sy = sy % SCREEN_HEIGHT;
+    int dx[9] = {0,0,0,1,1,1,-1,-1,-1};
+    int dy[9] = {0,-1,1,0, -1, 1, 0, -1, 1};
+    for (int i = 0; i < 9; i++) {
+        DrawTextureEx(background, (Vector2){-sx + dx[i] * SCREEN_WIDTH, sy + dy[i] * SCREEN_HEIGHT}, 0.0f, 2.0f, (Color){255,255,255, 100});
+    }
+}
 
 void draw_spaceship(State state) {
     // Η γωνία που σχηματίζει το διάνυσμα orientation με τον θετικό ημιάξονα x
@@ -11,13 +22,14 @@ void draw_spaceship(State state) {
     Vector2 spaceship_origin = (Vector2){SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2};
     DrawTexturePro(spaceship, spaceship_source, spaceship_dest, spaceship_origin, angle, WHITE);
 }
+
 void draw_asteroid(int sx, int sy, Object asteroid) {
     int type = asteroid->asteroid_state->type;
     double angle = atan2(asteroid->asteroid_state->rotation.y, asteroid->asteroid_state->rotation.x);
     // Προσαρμογή της γωνίας στο σύστημα συντεταγμένων της raylib
     angle = 90 - angle * RAD2DEG;
 
-    float scale_ratio = asteroid->size / ASTEROID_SCALE_SIZE;
+    float scale_ratio = asteroid->size / ASTEROID_MAX_SIZE;
     float width = ASTEROID_WIDTH * scale_ratio;
     float height = ASTEROID_HEIGHT * scale_ratio;
 
@@ -63,6 +75,7 @@ void draw_objects(State state) {
 }
 
 void draw_game_screen(State state) {
+    draw_background(state);
     draw_spaceship(state);
     draw_objects(state);
 

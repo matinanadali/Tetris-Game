@@ -10,6 +10,7 @@ Rectangle play_button_bounds = {40, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
 Rectangle rules_button_bounds = {80 + BUTTON_WIDTH, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
 Rectangle home_button_bounds = {MID_WIDTH - (BUTTON_WIDTH / 2), SCREEN_HEIGHT - BUTTON_HEIGHT - 80, BUTTON_WIDTH,  BUTTON_HEIGHT};
 Texture spaceship;
+Texture asteroids;
 Texture background;
 Texture rules_button;
 Texture play_button;
@@ -27,6 +28,7 @@ void interface_init() {
     rules_button = LoadTexture("assets/rules_button.png");
     play_button = LoadTexture("assets/play_button.png");
     home_button = LoadTexture("assets/home_button.png");
+    asteroids = LoadTexture("assets/asteroids.png");
     font = LoadFont("assets/ARCADE_N.TTF");
    
 

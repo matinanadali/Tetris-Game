@@ -19,6 +19,9 @@
 #define SPACESHIP_ACCELERATION 0.1
 #define SPACESHIP_SLOWDOWN 0.98
 
+#define ASTEROID_MAX_ROTATION_SPEED (PI/32)
+#define ASTEROID_MIN_ROTATION_SPEED (-PI/32)
+
 #define SCREEN_WIDTH 900	// Πλάτος της οθόνης
 #define SCREEN_HEIGHT 700	// Υψος της οθόνης
 
@@ -34,13 +37,20 @@ typedef enum {
 	WELCOME, GAME, RULES
 } ScreenState;
 
+typedef struct asteroid_state {
+	int type;					// Τύπος αστεροειδούς (0 - 7)
+	Vector2 rotation;			// Περιστροφή αστεροειδούς
+	float rotation_speed;		// Γωνιακή ταχύτητα αστεροειδούς
+} *AsteroidState;
+
 // Πληροφορίες για κάθε αντικείμενο
 typedef struct object {
-	ObjectType type;			// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
-	Vector2 position;			// Θέση
-	Vector2 speed;				// Ταχύτητα (pixels/frame)
-	double size;				// Μέγεθος (pixels)
-	Vector2 orientation;		// Κατεύθυνση (μόνο για διαστημόπλοιο)
+	ObjectType type;				// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
+	AsteroidState asteroid_state;	// Πληροφορίες για τον αστεροειδή (αν το αντικείμενο είναι αστεροειδής)
+	Vector2 position;				// Θέση
+	Vector2 speed;					// Ταχύτητα (pixels/frame)
+	double size;					// Μέγεθος (pixels)
+	Vector2 orientation;			// Κατεύθυνση (μόνο για διαστημόπλοιο)
 }* Object;
 
 // Γενικές πληροφορίες για την κατάσταση του παιχνιδιού

@@ -1,42 +1,36 @@
 #include "game_screen.h"
 
-
-// Μεταβιβάζει τα ορίσματα pointA, pointB και pointC στη συνάρτηση βιβλιοθήκης DrawTrianlgeLines
-// με τη σωστή σειρά (counter-clockwise)
-void DrawTriangleLinesHelper(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
-    double slope1 = (pointB.y - pointA.y) * (pointC.x - pointB.x);
-    double slope2 = (pointC.y - pointB.y) * (pointB.x - pointA.x);
-    if (slope1 > slope2) {
-        DrawTriangleLines(pointA, pointB, pointC, WHITE);
-    }
-    else {
-        DrawTriangleLines(pointA, pointC, pointB, WHITE);
-    }
-} 
-
-void draw_game_screen(State state) {
-    // Σχεδιάζουμε το διαστημόπλοιο
-
+void draw_spaceship(State state) {
     // Η γωνία που σχηματίζει το διάνυσμα orientation με τον θετικό ημιάξονα x
     double angle = atan2(state_info(state)->spaceship->orientation.y, state_info(state)->spaceship->orientation.x);
+    // Προσαρμογή της γωνίας στο σύστημα συντεταγμένων της raylib
+    angle = 90 - angle * RAD2DEG;
 
-    // Αρχικοποιούμε το διαστημόπλοιο ως ένα ισοσκελές τρίγωνο που δείχνει προς τα πάνω
-    Vector2 pointA = {0, -40};
-    Vector2 pointB = {20, 0};
-    Vector2 pointC = {-20,0};
-    
-    // Περιστρέφουμε το διαστήμοπλοιο, ώστε να δείξει στην κατεύθυνση του orientation
-    pointA = vec2_rotate(pointA, -angle + PI / 2);
-    pointB = vec2_rotate(pointB, -angle + PI / 2);
-    pointC = vec2_rotate(pointC, -angle + PI / 2);
+    Rectangle spaceship_source = (Rectangle){0,0,SPACESHIP_WIDTH, SPACESHIP_HEIGHT};
+    Rectangle spaceship_dest = (Rectangle){MID_WIDTH,MID_HEIGHT, SPACESHIP_WIDTH, SPACESHIP_HEIGHT};
+    Vector2 spaceship_origin = (Vector2){SPACESHIP_WIDTH/2, SPACESHIP_HEIGHT/2};
+    DrawTexturePro(spaceship, spaceship_source, spaceship_dest, spaceship_origin, angle, WHITE);
+}
+void draw_asteroid(int sx, int sy, Object asteroid) {
+    int type = asteroid->asteroid_state->type;
+    double angle = atan2(asteroid->asteroid_state->rotation.y, asteroid->asteroid_state->rotation.x);
+    // Προσαρμογή της γωνίας στο σύστημα συντεταγμένων της raylib
+    angle = 90 - angle * RAD2DEG;
 
-    // Μεταφέρουμε το διαστημόπλοιο στο κέντρο της οθόνης
-    pointA = vec2_add(pointA, (Vector2){MID_WIDTH, MID_HEIGHT}); 
-    pointB = vec2_add(pointB, (Vector2){MID_WIDTH, MID_HEIGHT});
-    pointC = vec2_add(pointC, (Vector2){MID_WIDTH, MID_HEIGHT});
-  
-    DrawTriangleLinesHelper(pointA, pointB, pointC);
+    float scale_ratio = asteroid->size / ASTEROID_SCALE_SIZE;
+    float width = ASTEROID_WIDTH * scale_ratio;
+    float height = ASTEROID_HEIGHT * scale_ratio;
 
+    Rectangle asteroid_source = (Rectangle){type * ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT};
+    Rectangle asteroid_dest = (Rectangle){asteroid->position.x-sx+MID_WIDTH+width/2, 
+                                          -asteroid->position.y+sy+MID_HEIGHT+height/2, 
+                                          width, 
+                                          height};
+    Vector2 asteroid_origin = (Vector2){width/2, height/2};
+    DrawTexturePro(asteroids, asteroid_source, asteroid_dest, asteroid_origin, angle, WHITE);
+}
+
+void draw_objects(State state) {
     // Συντεταγμένες διαστημοπλοίου
     double sx = state_info(state)->spaceship->position.x;
     double sy = state_info(state)->spaceship->position.y;
@@ -59,13 +53,19 @@ void draw_game_screen(State state) {
         if (object->type == BULLET) {
             DrawCircle(object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, object->size, WHITE);
         } else {
-            DrawCircleLines(object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, object->size, WHITE);
+            draw_asteroid(sx, sy, object);
         }
        
     }
 
     // Αποδέσμευση μνήμης
     list_destroy(objects);
+}
+
+void draw_game_screen(State state) {
+    draw_spaceship(state);
+    draw_objects(state);
+
     // Σχεδιάζουμε το σκορ
     DrawText(TextFormat("%04i", state_info(state)->score), 20, 20, 40, GRAY);
 	DrawFPS(SCREEN_WIDTH - 80, 0);

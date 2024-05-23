@@ -14,16 +14,20 @@
 #define BULLET_SPEED 10
 #define BULLET_SIZE 3
 #define BULLET_DELAY 15
-#define SPACESHIP_SIZE 40
+#define SPACESHIP_SIZE 85
 #define SPACESHIP_ROTATION (PI/32)
 #define SPACESHIP_ACCELERATION 0.1
 #define SPACESHIP_SLOWDOWN 0.98
 
 #define ASTEROID_MAX_ROTATION_SPEED (PI/32)
 #define ASTEROID_MIN_ROTATION_SPEED (-PI/32)
+#define ASTEROID_WIDTH 90
+#define ASTEROID_HEIGHT 90
 
 #define SCREEN_WIDTH 900	// Πλάτος της οθόνης
 #define SCREEN_HEIGHT 700	// Υψος της οθόνης
+#define MID_WIDTH ( SCREEN_WIDTH / 2 )
+#define MID_HEIGHT ( SCREEN_HEIGHT / 2 )
 
 typedef enum {
 	SPACESHIP, ASTEROID, BULLET
@@ -56,7 +60,9 @@ typedef struct object {
 // Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
 typedef struct state_info {
 	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
-	ScreenState screen_state;
+	ScreenState screen_state;		// Πληροφορίες για το σε ποια οθόνη βρισκόμαστε (welcome, game, rules)
+	bool collision_occured;			
+	bool bullet_thrown;
 	bool paused;					// true αν το παιχνίδι είναι paused
 	int score;						// το τρέχον σκορ
 }* StateInfo;

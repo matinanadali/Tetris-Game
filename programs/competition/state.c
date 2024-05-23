@@ -44,9 +44,23 @@ bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_righ
 		   position.y >= bottom_right.y;
 }
 
+float get_object_radius(Object object) {
+	float radius;
+	if (object->type == ASTEROID) {
+		radius = object->size / ASTEROID_MAX_SIZE * ASTEROID_WIDTH / 2;
+	} else if (object->type == BULLET) {
+		radius = object->size;
+	} else {
+		radius = SPACESHIP_SIZE / 2;
+	}
+	return radius;
+}
+
 // Ελέγχει αν τα αντικέιμενα a και b (θεωρούνται σφαιρικά κέντρου object->position και ακτίνας object->size) συγκρούονται
 bool collide(Object a, Object b) {
-	return CheckCollisionCircles(a->position, a->size, b->position, b->size);
+	float a_radius = get_object_radius(a);
+	float b_radius = get_object_radius(b);
+	return CheckCollisionCircles(a->position, a_radius, b->position, b_radius);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -97,8 +111,10 @@ State state_create() {
 	state->info.paused = false;				// Το παιχνίδι ξεκινάει χωρίς να είναι paused.
 	state->speed_factor = 1;				// Κανονική ταχύτητα
 	state->next_bullet = 0;					// Σφαίρα επιτρέπεται αμέσως
-	state->info.score = 0;				// Αρχικό σκορ 0
-	state->info.screen_state = WELCOME;			
+	state->info.score = 0;					// Αρχικό σκορ 0
+	state->info.screen_state = WELCOME;
+	state->info.bullet_thrown = false;
+	state->info.collision_occured = false;			
 
 	// Δημιουργούμε το vector των αντικειμένων, και προσθέτουμε αντικείμενα
 	state->objects = vector_create(0, (DestroyFunc)destroy_object);
@@ -209,6 +225,8 @@ Object create_new_asteroid(int size, int speed_value, Vector2 spaceship_position
 // Προσθέτει μία σφαίρα, μόνο αν έχουν περάσει τουλάχιστον BULLET_DELAY frames από την προηγούμενη
 void add_bullet(State state) {
 	if (state->next_bullet > 0) return;
+	
+	state->info.bullet_thrown = true;
 	Object spaceship = state->info.spaceship;
 	
 	// Η σφαίρα έχει σχετική ταχύτητα BULLET_SPEED ως προς το διαστημόπλοιο
@@ -323,6 +341,11 @@ void handle_asteroid_spaceship_collision(State state, int pos) {
 
 // Εντοπίζει τις συγκρούσεις αστεροειδή-διαστημοπλοίου και αστεροειδή-σφαίρας
 void handle_collisions(State state) {
+	state->info.collision_occured = false;
+	// Συντεταγμένες διαστημοπλοίου
+    double sx = state_info(state)->spaceship->position.x;
+    double sy = state_info(state)->spaceship->position.y;
+
 	// Εντοπισμός συγκρούσεων αστεροειδή-σφαίρας
 	for (int i = 0; i < vector_size(state->objects); i++) {
 		if (((Object)vector_get_at(state->objects, i))->type != ASTEROID) continue;
@@ -339,6 +362,10 @@ void handle_collisions(State state) {
 				// Αν ο αστεροειδής καταστραφεί, δεν μπορεί να συγκρουστεί ξανά με κάποιο αντικείμενο
 				destroyed = true;
 				i--;	// Για να μην προσπεράσουμε το στοιχείο που μεταφέρθηκε στη θέση i από τη vector_remove_at
+
+				// Αν η σύγκρουση ήταν ορατή, σημειώνουμε ότι συνέβη
+				if (is_inside_rectangle(asteroid->position, (Vector2){sx-MID_WIDTH, sy+MID_HEIGHT}, (Vector2){sx+MID_WIDTH, sy-MID_HEIGHT})) 
+					state->info.collision_occured = true;
 				break;
 			}
 
@@ -348,6 +375,9 @@ void handle_collisions(State state) {
 		if (!destroyed && collide(asteroid, state->info.spaceship)) {
 			handle_asteroid_spaceship_collision(state, i);
 			i--;
+			// Αν η σύγκρουση ήταν ορατή, σημειώνουμε ότι συνέβη
+			if (is_inside_rectangle(asteroid->position, (Vector2){sx-MID_WIDTH, sy+MID_HEIGHT}, (Vector2){sx+MID_WIDTH, sy-MID_HEIGHT})) 
+				state->info.collision_occured = true;
 		}		
 	}
 }
@@ -398,6 +428,7 @@ void state_update(State state, KeyState keys, ButtonState buttons) {
 	// Συγκρούσεις
 	handle_collisions(state);
 
+	state->info.bullet_thrown = false;
 	// Προσθήκη νέας σφαίρας
 	if (keys->space) {
 		add_bullet(state);

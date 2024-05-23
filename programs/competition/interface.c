@@ -16,6 +16,8 @@ Texture rules_button;
 Texture play_button;
 Texture home_button;
 Font font;
+Sound collision_sound;
+Sound bullet_sound;
 
 
 void interface_init() {
@@ -30,8 +32,9 @@ void interface_init() {
     home_button = LoadTexture("assets/home_button.png");
     asteroids = LoadTexture("assets/asteroids.png");
     font = LoadFont("assets/ARCADE_N.TTF");
+    collision_sound = LoadSound("assets/collision_sound.wav");
+    bullet_sound = LoadSound("assets/bullet_sound.wav");
    
-
     InitAudioDevice();    
     // Φόρτωση μουσικής
     music = LoadMusicStream("assets/cover.mp3");

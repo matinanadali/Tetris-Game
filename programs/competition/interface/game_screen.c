@@ -74,10 +74,20 @@ void draw_objects(State state) {
     list_destroy(objects);
 }
 
+void play_sounds(State state) {
+    if (state_info(state)->bullet_thrown) {
+        PlaySound(bullet_sound);
+    }
+    if (state_info(state)->collision_occured) {
+        PlaySound(collision_sound);
+    } 
+}
+
 void draw_game_screen(State state) {
     draw_background(state);
     draw_spaceship(state);
     draw_objects(state);
+    play_sounds(state);
 
     // Σχεδιάζουμε το σκορ
     DrawText(TextFormat("%04i", state_info(state)->score), 20, 20, 40, GRAY);

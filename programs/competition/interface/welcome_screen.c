@@ -9,5 +9,5 @@ void draw_welcome_screen(State state) {
     DrawText("ASTEROIDS GAME", 40, MID_HEIGHT-80, 50, WHITE);
     DrawTextureEx(play_button, (Vector2){40, MID_HEIGHT}, 0.0, 1.3, WHITE);
     DrawTextureEx(rules_button, (Vector2){100 + BUTTON_WIDTH, MID_HEIGHT}, 0.0, 1.3, WHITE);  
-    DrawTextureEx(spaceship, (Vector2){SCREEN_WIDTH-250, SCREEN_HEIGHT-200}, 0.0, 1.5, WHITE);
+    DrawTextureEx(spaceship, (Vector2){3*MID_WIDTH/2-SPACESHIP_WIDTH/2, SCREEN_HEIGHT-200}, 0.0, 1.5, WHITE);
 }

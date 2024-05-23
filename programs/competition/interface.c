@@ -2,6 +2,7 @@
 #include "welcome_screen.h"
 #include "game_screen.h"
 #include "rules_screen.h"
+#include "transition_screen.h"
 
 Music music;
 
@@ -54,10 +55,12 @@ void interface_draw_frame(State state) {
     // Καθαρισμός, θα τα σχεδιάσουμε όλα από την αρχή
 	ClearBackground(BLACK);
 
-    if (state_info(state)->screen_state == WELCOME) {
+    if (state_info(state)->screen_state->screen == WELCOME) {
         draw_welcome_screen(state);
-    } else if (state_info(state)->screen_state == GAME) {
+    } else if (state_info(state)->screen_state->screen == GAME) {
         draw_game_screen(state);
+    } else if (state_info(state)->screen_state->screen == TRANSITION) {
+        draw_transition_screen(state);
     } else {
         draw_rules_screen(state);
     }

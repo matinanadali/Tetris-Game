@@ -7,7 +7,7 @@ void draw_background(State state) {
     int dx[9] = {0,0,0,1,1,1,-1,-1,-1};
     int dy[9] = {0,-1,1,0, -1, 1, 0, -1, 1};
     for (int i = 0; i < 9; i++) {
-        DrawTextureEx(background, (Vector2){-sx + dx[i] * SCREEN_WIDTH, sy + dy[i] * SCREEN_HEIGHT}, 0.0f, 2.0f, (Color){255,255,255, 100});
+        DrawTextureEx(background, (Vector2){-sx + dx[i] * SCREEN_WIDTH, sy + dy[i] * SCREEN_HEIGHT}, 0.0f, 2.0f, (Color){255,255,255, 70});
     }
 }
 

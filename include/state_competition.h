@@ -38,14 +38,19 @@ typedef enum {
 } VerticalMovement;
 
 typedef enum {
-	WELCOME, GAME, RULES
-} ScreenState;
+	WELCOME, TRANSITION, GAME, RULES
+} Screen;
 
 typedef struct asteroid_state {
 	int type;					// Τύπος αστεροειδούς (0 - 7)
 	Vector2 rotation;			// Περιστροφή αστεροειδούς
 	float rotation_speed;		// Γωνιακή ταχύτητα αστεροειδούς
 } *AsteroidState;
+
+typedef struct screen_state {
+	Screen screen;
+	int frames_in_transition;
+} *ScreenState;
 
 // Πληροφορίες για κάθε αντικείμενο
 typedef struct object {
@@ -60,7 +65,7 @@ typedef struct object {
 // Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
 typedef struct state_info {
 	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
-	ScreenState screen_state;		// Πληροφορίες για το σε ποια οθόνη βρισκόμαστε (welcome, game, rules)
+	ScreenState screen_state;		// Πληροφορίες για το σε ποια οθόνη βρισκόμαστε (welcome, transition, game, rules)
 	bool collision_occured;			
 	bool bullet_thrown;
 	bool paused;					// true αν το παιχνίδι είναι paused
@@ -77,7 +82,6 @@ typedef struct key_state {
 	bool n;
 	bool p;
 }* KeyState;
-
 
 // Πληοροφορίες για το ποια κουμπιά της αρχικής οθόνης έχουν πατηθεί
 typedef struct button_state {

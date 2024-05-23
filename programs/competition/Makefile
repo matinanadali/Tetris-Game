@@ -12,7 +12,7 @@ CFLAGS = -Wall -Werror -g $(INCLUDE)
 LDFLAGS = -lm
 
 # Αρχεία .o
-OBJS = game.o state.o ./interface.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a $(INTERFACE)/welcome_screen.o $(INTERFACE)/game_screen.o $(INTERFACE)/rules_screen.o
+OBJS = game.o state.o ./interface.o $(MODULES)/vec2.o $(LIB)/k08.a $(LIB)/libraylib.a $(INTERFACE)/welcome_screen.o $(INTERFACE)/game_screen.o $(INTERFACE)/rules_screen.o $(INTERFACE)/transition_screen.o
 
 # Εκτελέσιμα αρχεία
 EXEC = game

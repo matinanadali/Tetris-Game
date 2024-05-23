@@ -10,6 +10,7 @@
 #define SPACESHIP_WIDTH 99
 #define SPACESHIP_HEIGHT 75
 
+extern float scrolling_back;
 extern Rectangle play_button_bounds;
 extern Rectangle rules_button_bounds;
 extern Rectangle home_button_bounds;

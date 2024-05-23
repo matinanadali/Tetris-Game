@@ -112,7 +112,9 @@ State state_create() {
 	state->speed_factor = 1;				// Κανονική ταχύτητα
 	state->next_bullet = 0;					// Σφαίρα επιτρέπεται αμέσως
 	state->info.score = 0;					// Αρχικό σκορ 0
-	state->info.screen_state = WELCOME;
+	state->info.screen_state = malloc(sizeof(struct screen_state));
+	state->info.screen_state->screen = WELCOME;
+	state->info.screen_state->frames_in_transition = 0;
 	state->info.bullet_thrown = false;
 	state->info.collision_occured = false;			
 
@@ -386,14 +388,23 @@ void handle_collisions(State state) {
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys, ButtonState buttons) {
 	if (buttons->play) {
-		state->info.screen_state = GAME;
+		state->info.screen_state->screen = TRANSITION;
 	} else if (buttons->rules) {
-		state->info.screen_state = RULES;
-		return;
+		state->info.screen_state ->screen = RULES;
 	} else if (buttons->home) {
-		state->info.screen_state = WELCOME;
-		return;
+		state->info.screen_state->screen = WELCOME;
 	}
+
+	if (state->info.screen_state->screen == TRANSITION) {
+		if (state->info.screen_state->frames_in_transition == 220) {
+			state->info.screen_state->frames_in_transition = 0;
+			state->info.screen_state->screen = GAME;
+		} else {
+			state->info.screen_state->frames_in_transition++;
+		}
+	}
+
+	if (state->info.screen_state->screen != GAME) return;
 
 	// Αλλαγή κατάστασης του παιχνιδιού (paused - not paused)
 	if (keys->p) {
@@ -451,6 +462,7 @@ void state_update(State state, KeyState keys, ButtonState buttons) {
 // Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη
 void state_destroy(State state) {
 	vector_destroy(state->objects);
+	free(state->info.screen_state);
 	free(state->info.spaceship);
 	free(state);
 }

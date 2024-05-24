@@ -37,8 +37,8 @@ void draw_asteroid(int sx, int sy, Object asteroid) {
     float height = ASTEROID_HEIGHT * scale_ratio;
 
     Rectangle asteroid_source = (Rectangle){type * ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT};
-    Rectangle asteroid_dest = (Rectangle){asteroid->position.x-sx+MID_WIDTH+width/2, 
-                                          -asteroid->position.y+sy+MID_HEIGHT+height/2, 
+    Rectangle asteroid_dest = (Rectangle){asteroid->position.x-sx+MID_WIDTH, 
+                                          -asteroid->position.y+sy+MID_HEIGHT, 
                                           width, 
                                           height};
     Vector2 asteroid_origin = (Vector2){width/2, height/2};

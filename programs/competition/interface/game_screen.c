@@ -26,7 +26,7 @@ void draw_spaceship(State state) {
     DrawTexturePro(spaceship, spaceship_source, spaceship_dest, spaceship_origin, angle, WHITE);
 }
 
-void draw_asteroid(int sx, int sy, Object asteroid) {
+void draw_asteroid(double sx, double sy, Object asteroid) {
     int type = asteroid->asteroid_state->type;
     double angle = atan2(asteroid->asteroid_state->rotation.y, asteroid->asteroid_state->rotation.x);
     // Προσαρμογή της γωνίας στο σύστημα συντεταγμένων της raylib
@@ -43,6 +43,20 @@ void draw_asteroid(int sx, int sy, Object asteroid) {
                                           height};
     Vector2 asteroid_origin = (Vector2){width/2, height/2};
     DrawTexturePro(asteroids, asteroid_source, asteroid_dest, asteroid_origin, angle, WHITE);
+}
+
+void draw_bullet(double sx, double sy, Object bullet_obj) {
+    double angle = atan2(bullet_obj->orientation.y, bullet_obj->orientation.x);
+    // Προσαρμογή της γωνίας στο σύστημα συντεταγμένων της raylib
+    angle = 90 - angle * RAD2DEG;
+
+    Rectangle bullet_source = (Rectangle){0, 0, BULLET_WIDTH, BULLET_HEIGHT};
+    Rectangle bullet_dest = (Rectangle){bullet_obj->position.x-sx+MID_WIDTH, 
+                                        -bullet_obj->position.y+sy+MID_HEIGHT, 
+                                        BULLET_WIDTH, 
+                                        BULLET_HEIGHT};
+    Vector2 bullet_origin = (Vector2){BULLET_WIDTH/2, BULLET_HEIGHT/2};   
+    DrawTexturePro(bullet, bullet_source, bullet_dest, bullet_origin, angle, WHITE);                          
 }
 
 void draw_objects(State state) {
@@ -66,7 +80,7 @@ void draw_objects(State state) {
         // Επειδή η βιβλιοθήκη θεωρεί ότι τα y αυξάνονται προς τα κάτω, 
         // αλλάζουμε πρόσημο στις y συντεταγμένες των αντικειμένων
         if (object->type == BULLET) {
-            DrawCircle(object->position.x-sx+MID_WIDTH, -object->position.y +sy+MID_HEIGHT, object->size, bullet_color);
+            draw_bullet(sx, sy, object);
         } else if (object->type == ASTEROID) {
             draw_asteroid(sx, sy, object);
         } else {
@@ -106,8 +120,8 @@ void draw_game_stats(State state) {
 
 void draw_game_screen(State state) {
     draw_background(state);
-    draw_spaceship(state);
     draw_objects(state);
+    draw_spaceship(state);
     play_sounds(state);
     draw_game_stats(state);
 }

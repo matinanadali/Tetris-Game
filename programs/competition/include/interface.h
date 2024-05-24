@@ -19,6 +19,7 @@ extern Rectangle home_button_bounds_in_rules;
 extern Rectangle home_button_bounds_in_game_over;
 extern Rectangle play_again_button_bounds;
 extern Texture spaceship;
+extern Texture bullet;
 extern Texture background;
 extern Texture play_button;
 extern Texture rules_button;

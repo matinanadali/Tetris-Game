@@ -272,8 +272,9 @@ void add_bullet(State state) {
 	Vector2 speed = vec2_add(spaceship->speed, vec2_scale(spaceship->orientation, BULLET_SPEED));
 	// Η σφαίρα αρχικά βρίσκεται στη θέση του διαστημοπλοίου
 	Vector2 position = spaceship->position;
-
-	vector_insert_last(state->objects, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
+	// Η σφαίρα έχει την κατεύθυνση του διαστημοπλοίου
+	Vector2 orientation = spaceship->orientation;
+	vector_insert_last(state->objects, create_object(BULLET, position, speed, orientation, BULLET_SIZE));
 
 	state->next_bullet = BULLET_DELAY;
 	state_info(state)->stats->bullets_left--;

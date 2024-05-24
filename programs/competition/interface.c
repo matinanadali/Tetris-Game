@@ -23,6 +23,7 @@ Texture credits_button;
 Texture bullet_left;
 Texture life;
 Texture star;
+Texture bullet;
 Font font;
 Sound collision_sound;
 Sound bullet_sound;
@@ -40,6 +41,7 @@ void interface_init() {
     play_again_button = LoadTexture("assets/play_again_button.png");
     credits_button = LoadTexture("assets/credits_button.png");
     asteroids = LoadTexture("assets/asteroids.png");
+    bullet = LoadTexture("assets/bullet.png");
     bullet_left = LoadTexture("assets/bullet_left.png");
     life = LoadTexture("assets/life.png");
     font = LoadFont("assets/ARCADE_N.TTF");

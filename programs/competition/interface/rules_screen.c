@@ -1,22 +1,21 @@
 #include "rules_screen.h"
 #define TEXT_HEIGHT 30
-float scroll = 0.0f;
-char *rules_text[10] = {"In this game, a spaceship explores the vast space, trying to avoid asteroids", 
-                      "hat appear in its path. The goal of the game is for the spaceship to travel",
-                      "as far as possible minimizing the number of asteroids it destroys.\n",
-                      "1. Each time a new asteroid appears, your score goes up by 1.",
-                      "2. If an asteroid is hit by a bullet, your score drops by 10.",
-                      "3. If your spaceship crashes into an asteroid, you lose half of your score.",
-                      "4. Every time your score reaches a multiple of 100,", "the game's speed increases by 10%.",
-                      "Navigate through space, dodge those asteroids, and see how long you can survive",
-                      "in this thrilling interstellar adventure!"}
-                      ;
-
+char *rules_text[10] = {"Welcome to Interstellar Adventure! Your mission is to navigate a spaceship", 
+                        "through the vast expanse of space, collecting stars and avoiding asteroids.",
+                        "Here are the rules to help you on your journey:\n",
+                        "1. Each star you collect increases your score by 1 point.",
+                        "2. For every 10 stars you collect, you earn",
+                        "one more bullet to help clear your path.\n",
+                        "3. If your spaceship crashes into an asteroid, you lose one life.",
+                        "4. The game ends, when you have lost all of your lives.",
+                        "Navigate through space, dodge those asteroids, and see how long you can survive",
+                        "in this thrilling interstellar adventure!"};
+                      
 void draw_rules_screen(State state) {
-    scroll += 0.2f;
-    if (scroll >= 2*SCREEN_HEIGHT) scroll = 0;
-    DrawTextureEx(background, (Vector2){ 0, scroll }, 0.0f, 2.0f, (Color){255,255,255, 70});
-    DrawTextureEx(background, (Vector2){ 0, -SCREEN_HEIGHT + scroll}, 0.0f, 2.0f, (Color){255,255,255, 70});
+    scrolling_back += 0.2f;
+    if (scrolling_back >= 2*SCREEN_HEIGHT) scrolling_back = 0;
+    DrawTextureEx(background, (Vector2){ 0, scrolling_back }, 0.0f, 2.0f, (Color){255,255,255, 70});
+    DrawTextureEx(background, (Vector2){ 0, -SCREEN_HEIGHT + scrolling_back}, 0.0f, 2.0f, (Color){255,255,255, 70});
 
     Vector2 text_size = MeasureTextEx(font, "RULES", 50, 0);
     DrawTextEx(font, "RULES", (Vector2){MID_WIDTH - text_size.x / 2, 40}, 50, 0, WHITE);

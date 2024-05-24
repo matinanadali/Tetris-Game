@@ -18,11 +18,25 @@ void update_and_draw() {
     };
 
     Vector2 mousePoint = GetMousePosition();
+    Screen screen = state_info(state)->screen_state->screen;
     struct button_state buttons = (struct button_state){
-        CheckCollisionPointRec(mousePoint, play_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON),
-        CheckCollisionPointRec(mousePoint, rules_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON),
-        CheckCollisionPointRec(mousePoint, home_button_bounds) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)
+
+        ((screen == WELCOME && CheckCollisionPointRec(mousePoint, play_button_bounds)) ||
+         (screen == GAME_OVER && CheckCollisionPointRec(mousePoint, play_again_button_bounds))) && 
+         IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+
+        screen == WELCOME && CheckCollisionPointRec(mousePoint, rules_button_bounds) && 
+        IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+
+        ((screen == RULES && CheckCollisionPointRec(mousePoint, home_button_bounds_in_rules)) ||
+         (screen == GAME_OVER && CheckCollisionPointRec(mousePoint, home_button_bounds_in_game_over))) &&
+        IsMouseButtonDown(MOUSE_LEFT_BUTTON)
     };
+
+    if (buttons.play) {
+        state_destroy(state);
+        state = state_create();
+    }
     
 	state_update(state, &keys, &buttons);
 	interface_draw_frame(state);

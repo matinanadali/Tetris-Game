@@ -90,7 +90,7 @@ void play_sounds(State state) {
 
 void draw_game_stats(State state) {
     int i;
-    for (i = 0; i < max(5, state_info(state)->stats->bullets_left); i++) {
+    for (i = 0; i < state_info(state)->stats->bullets_left; i++) {
         DrawTexture(bullet_left, i * BULLET_LEFT_WIDTH + 40, 40, WHITE);
     }
 
@@ -98,7 +98,7 @@ void draw_game_stats(State state) {
         DrawTextEx(font, "+1!", (Vector2){i * BULLET_LEFT_WIDTH + 40, 30}, 40, 0, WHITE);
     }
 
-    for (i = 0; i < max(5, state_info(state)->stats->lives); i++) {
+    for (i = 0; i < state_info(state)->stats->lives; i++) {
         DrawTexture(life, SCREEN_WIDTH - i * LIFE_WIDTH - 40, 40, WHITE);
     }
     DrawText(TextFormat("%d", state_info(state)->stats->score), MID_WIDTH, 40, 40, WHITE); 

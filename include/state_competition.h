@@ -44,7 +44,7 @@ typedef enum {
 } VerticalMovement;
 
 typedef enum {
-	WELCOME, TRANSITION, GAME, RULES
+	WELCOME, TRANSITION, GAME, RULES, GAME_OVER
 } Screen;
 
 typedef struct asteroid_state {

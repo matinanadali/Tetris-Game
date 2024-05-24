@@ -284,8 +284,10 @@ void add_bullet(State state) {
 void score_update(State state, int points) {
 	state->info.stats->score += points;
 	if (state->info.stats->score != 0 && state->info.stats->score % 10 == 0) {
-		state->info.stats->bullets_left++;
-		state->info.events->bullet_added = 1;
+		if (state->info.stats->bullets_left < 5) {
+			state->info.stats->bullets_left++;
+			state->info.events->bullet_added = 1;
+		}
 	}
 }
 
@@ -445,6 +447,14 @@ void time_from_added_bullet_update(State state) {
 	}
 }
 
+bool game_over(State state) {
+	if (state->info.stats->lives == 0) {
+		state->info.screen_state->screen = GAME_OVER;
+		return true;
+	}
+	return false;
+}
+
 // Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
 // Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
 void state_update(State state, KeyState keys, ButtonState buttons) {
@@ -478,6 +488,8 @@ void state_update(State state, KeyState keys, ButtonState buttons) {
 	}
 
 	if (state->info.paused) return;
+
+	if (game_over(state)) return;
 
 	// Προσθήκη νέων αστεροειδών και αστεριών
 	num_objects_update(state);

@@ -10,15 +10,21 @@
 #define SPACESHIP_WIDTH 99
 #define SPACESHIP_HEIGHT 75
 
+#define PLAY_AGAIN_BUTTON_WIDTH 297
+
 extern float scrolling_back;
 extern Rectangle play_button_bounds;
 extern Rectangle rules_button_bounds;
-extern Rectangle home_button_bounds;
+extern Rectangle home_button_bounds_in_rules;
+extern Rectangle home_button_bounds_in_game_over;
+extern Rectangle play_again_button_bounds;
 extern Texture spaceship;
 extern Texture background;
 extern Texture play_button;
 extern Texture rules_button;
 extern Texture home_button;
+extern Texture play_again_button;
+extern Texture credits_button;
 extern Texture asteroids;
 extern Texture bullet_left;
 extern Texture life;

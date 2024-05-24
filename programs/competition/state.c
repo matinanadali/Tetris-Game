@@ -274,7 +274,7 @@ void add_bullet(State state) {
 	Vector2 position = spaceship->position;
 	// Η σφαίρα έχει την κατεύθυνση του διαστημοπλοίου
 	Vector2 orientation = spaceship->orientation;
-	vector_insert_last(state->objects, create_object(BULLET, position, speed, orientation, BULLET_SIZE));
+	vector_insert_last(state->objects, create_object(BULLET, position, speed, orientation, 0));
 
 	state->next_bullet = BULLET_DELAY;
 	state_info(state)->stats->bullets_left--;
@@ -302,7 +302,7 @@ void spaceship_update(Object spaceship, KeyState keys, State state) {
 		spaceship->speed = vec2_add(spaceship->speed, acceleration);
 	} else {        // Eπιβράδυνση διαστημοπλοίου
 		Vector2 initial_speed = state->info.spaceship->speed;
-		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
+		Vector2 slowdown = vec2_scale(spaceship->speed, -SPACESHIP_SLOWDOWN);
 		spaceship->speed = vec2_add(spaceship->speed, slowdown);
 
 		// Η επιβράδυνση του διαστημοπλοίου μειώνει το μέτρο της ταχύτητας αλλά δεν πρέπει να αλλάζει την κατεύθυνσή της

@@ -36,13 +36,15 @@ void draw_asteroid(double sx, double sy, Object asteroid) {
     float width = ASTEROID_WIDTH * scale_ratio;
     float height = ASTEROID_HEIGHT * scale_ratio;
 
-    Rectangle asteroid_source = (Rectangle){type * ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT};
-    Rectangle asteroid_dest = (Rectangle){asteroid->position.x-sx+MID_WIDTH, 
-                                          -asteroid->position.y+sy+MID_HEIGHT, 
-                                          width, 
-                                          height};
-    Vector2 asteroid_origin = (Vector2){width/2, height/2};
-    DrawTexturePro(asteroids, asteroid_source, asteroid_dest, asteroid_origin, angle, WHITE);
+    if (asteroid->asteroid_state->frames_destroyed == 0) {
+        Rectangle asteroid_source = (Rectangle){type * ASTEROID_WIDTH, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT};
+        Rectangle asteroid_dest = (Rectangle){asteroid->position.x-sx+MID_WIDTH, 
+                                              -asteroid->position.y+sy+MID_HEIGHT, 
+                                              width, 
+                                              height};
+        Vector2 asteroid_origin = (Vector2){width * 0.5, height * 0.5};
+        DrawTexturePro(asteroids, asteroid_source, asteroid_dest, asteroid_origin, angle, WHITE);
+    } 
 }
 
 void draw_bullet(double sx, double sy, Object bullet_obj) {

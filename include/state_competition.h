@@ -52,7 +52,6 @@ typedef struct asteroid_state {
 	int type;					// Τύπος αστεροειδούς (0 - 7)
 	Vector2 rotation;			// Περιστροφή αστεροειδούς
 	float rotation_speed;		// Γωνιακή ταχύτητα αστεροειδούς
-	int frames_destroyed;
 } *AsteroidState;
 
 typedef struct screen_state {

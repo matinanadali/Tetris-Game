@@ -237,18 +237,9 @@ static void add_stars(State state, int num) {
 }
 
 // Βοηθητική συνάρτηση για τη handle_collisions:
-// Δημιουγεί έναν νέο αστεροειδή με συγκεκριμένη ταχύτητα και μέγεθος σε τυχαία απόσταση από το διαστημόπλοιο
-Object create_new_asteroid(int size, int speed_value, Vector2 orientation, Vector2 asteroid_position) {
-	double angle = atan2(orientation.y, orientation.x);
-	angle = PI/2 - angle;
-	
-	// Η ταχύτητα έχει ορισμένο μέτρο και τυχαία κατεύθυνση
-	Vector2 speed = vec2_from_polar(
-		speed_value,
-		angle + randf(-PI/4, PI/4)
-	);
-
-	Vector2 position = asteroid_position;
+// Δημιουγεί έναν νέο αστεροειδή με συγκεκριμένη ταχύτητα, τύπο και μέγεθος 
+Object create_new_asteroid(int size, double speed_value, double speed_angle, Vector2 position, int type) {
+	Vector2 speed = vec2_from_polar(speed_value, speed_angle);
 
 	Object new_asteroid = create_object(
 		ASTEROID,
@@ -257,6 +248,8 @@ Object create_new_asteroid(int size, int speed_value, Vector2 orientation, Vecto
 		(Vector2){0,0},
 		size
 	);
+
+	new_asteroid->asteroid_state->type = type;
 
 	return new_asteroid;
 }
@@ -357,15 +350,16 @@ void num_objects_update(State state) {
 }
 
 // Διαχειρίζεται τις συγκρούσεις αστεροειδούς - σφαίρας
-void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
+void handle_bullet_asteroid_collision(State state, Object bullet, Object asteroid, int pos) {
 	// Αν το μέγεθος του αρχικού αστεροειδούς ήταν αρκετά μεγάλο, 
 	// δημιουργούνται 2 νέοι με το μισό μέγεθος και ταχύτητα μέτρου 1.5 φορές μεγαλύτερη του αρχικού
 	if (asteroid->size >= 2*ASTEROID_MIN_SIZE) {
 		for (int i = 0; i < 2; i++) {
-			vector_insert_last(state->objects, create_new_asteroid(asteroid->size * 0.5, // μισό μέγεθος
-																   vec2_distance(asteroid->speed, (Vector2){0,0}) * 4, // ταχύτητα τετραπλάσιου μέτρου
-																   state->info.spaceship->orientation, // ίδια κατεύθυνση με το διαστημόπλοιο
-																   asteroid->position));	// ίδια θέση με τον αρχικό αστεροειδή
+			int speed_value = vec2_distance(asteroid->speed, (Vector2){0,0}) * 4; // ταχύτητα τετραπλάσιου μέτρου
+			Vector2 bullet_asteroid_vector = vec2_add(bullet->position, vec2_scale(asteroid->position, -1)) ;
+			double speed_angle = atan2(bullet_asteroid_vector.y, bullet_asteroid_vector.x) + PI / 2 + randf(ASTEROID_MIN_ANGLE_AFTER_COLLISION, ASTEROID_MAX_ANGLE_AFTER_COLLISION);
+			
+			vector_insert_last(state->objects, create_new_asteroid(asteroid->size * 0.5, speed_value, speed_angle, asteroid->position, asteroid->asteroid_state->type));	
 		}
 	}
 	// Διαγραφή αρχικού αστεροειδή
@@ -378,10 +372,10 @@ void handle_asteroid_spaceship_collision(State state, Object asteroid, int pos) 
 	// δημιουργούνται 2 νέοι με το μισό μέγεθος και ταχύτητα μέτρου 1.5 φορές μεγαλύτερη του αρχικού
 	if (asteroid->size >= 2*ASTEROID_MIN_SIZE) {
 		for (int i = 0; i < 2; i++) {
-			vector_insert_last(state->objects, create_new_asteroid(asteroid->size * 0.5, // μισό μέγεθος
-																   vec2_distance(asteroid->speed, (Vector2){0,0}) * 4, // ταχύτητα τετραπλάσιου μέτρου
-																   state->info.spaceship->orientation, // ίδια κατεύθυνση με το διαστημόπλοιο
-																   asteroid->position));	// ίδια θέση με τον αρχικό αστεροειδή
+			int speed_value = vec2_distance(asteroid->speed, (Vector2){0,0}) * 4; // ταχύτητα τετραπλάσιου μέτρου
+			Vector2 spaceship_asteroid_vector = vec2_add(state->info.spaceship->position, vec2_scale(asteroid->position, -1)) ;
+			double speed_angle = atan2(spaceship_asteroid_vector.y, spaceship_asteroid_vector.x) + PI / 2 + randf(ASTEROID_MIN_ANGLE_AFTER_COLLISION, ASTEROID_MAX_ANGLE_AFTER_COLLISION);
+			vector_insert_last(state->objects, create_new_asteroid(asteroid->size * 0.5, speed_value, speed_angle, asteroid->position, asteroid->asteroid_state->type));	
 		}
 	}
 
@@ -423,7 +417,7 @@ void handle_collisions(State state) {
 				Object bullet = vector_get_at(state->objects, j);
 
 				if (collide(asteroid, bullet)) {
-					handle_bullet_asteroid_collision(state, asteroid, i);
+					handle_bullet_asteroid_collision(state, bullet, asteroid, i);
 					// Αν ο αστεροειδής καταστραφεί, δεν μπορεί να συγκρουστεί ξανά με κάποιο αντικείμενο
 					destroyed = true;
 		

@@ -1,4 +1,5 @@
 #include "rules_screen.h"
+#define TEXT_HEIGHT 30 // ύψος γραμμής
 // Κείμενο κανόνων
 char *rules_text[10] = {"Welcome to Interstellar Adventure! Your mission is to navigate a spaceship", 
                         "through the vast expanse of space, collecting stars and avoiding asteroids.",

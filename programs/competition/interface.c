@@ -5,13 +5,15 @@
 #include "transition_screen.h"
 #include "game_over_screen.h"
 
-Music music;
+const Color bullet_color = (Color){165,58,57,232};
 
+// Θέσεις κουμπιών
 Rectangle play_button_bounds = {40, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
 Rectangle rules_button_bounds = {80 + BUTTON_WIDTH, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
 Rectangle home_button_bounds_in_rules = {MID_WIDTH - (BUTTON_WIDTH / 2), SCREEN_HEIGHT - BUTTON_HEIGHT - 80, BUTTON_WIDTH,  BUTTON_HEIGHT};
 Rectangle home_button_bounds_in_game_over = {MID_WIDTH - (BUTTON_WIDTH / 2), 300, BUTTON_WIDTH,  BUTTON_HEIGHT};
 Rectangle play_again_button_bounds = {MID_WIDTH - PLAY_AGAIN_BUTTON_WIDTH/2, 200, PLAY_AGAIN_BUTTON_WIDTH,  BUTTON_HEIGHT};
+// Γραφικά που χρησιμοποιόυνται
 Texture spaceship;
 Texture asteroids;
 Texture background;
@@ -24,14 +26,20 @@ Texture bullet_left;
 Texture life;
 Texture star;
 Texture bullet;
+// Γραμματοσειρά
 Font font;
+// Ήχοι
 Sound collision_sound;
 Sound bullet_sound;
+// Μουσική
+Music music;
 
 void interface_init() {
 	// Αρχικοποίηση του παραθύρου
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "game");
 	SetTargetFPS(60);
+
+    // Φόρτωση γραφικών
     spaceship = LoadTexture("assets/spaceship.png");
     // pexels.com Photo by Kai Pilger: https://www.pexels.com/photo/cluster-of-stars-1341279/
     background = LoadTexture("assets/background.png");
@@ -44,10 +52,14 @@ void interface_init() {
     bullet = LoadTexture("assets/bullet.png");
     bullet_left = LoadTexture("assets/bullet_left.png");
     life = LoadTexture("assets/life.png");
-    font = LoadFont("assets/ARCADE_N.TTF");
     star = LoadTexture("assets/star.png");
+
+    // Φόρτωση ήχων
     collision_sound = LoadSound("assets/collision_sound.wav");
     bullet_sound = LoadSound("assets/bullet_sound.wav");
+
+    // Φόρτωση γραμματοσειράς
+    font = LoadFont("assets/ARCADE_N.TTF");
    
     InitAudioDevice();    
     // Φόρτωση μουσικής
@@ -68,6 +80,7 @@ void interface_draw_frame(State state) {
     // Καθαρισμός, θα τα σχεδιάσουμε όλα από την αρχή
 	ClearBackground(BLACK);
 
+    // Κλήση αντίστοιχης συνάρτησης ανάλογα με την οθόνη στην οποία βρισκόμαστε
     if (state_info(state)->screen_state->screen == WELCOME) {
         draw_welcome_screen(state);
     } else if (state_info(state)->screen_state->screen == GAME) {

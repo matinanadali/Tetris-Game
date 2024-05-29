@@ -7,11 +7,15 @@
 
 #define BUTTON_WIDTH 162
 #define BUTTON_HEIGHT 70
+#define PLAY_AGAIN_BUTTON_WIDTH 297
 #define SPACESHIP_WIDTH 99
 #define SPACESHIP_HEIGHT 75
+// Πάχος εικονιδίου διαθέσιμης σφαίρας
+#define BULLET_LEFT_WIDTH 40
+// Πάχος εικονιδίου ζωής παίκτη
+#define LIFE_WIDTH 40
 
-#define PLAY_AGAIN_BUTTON_WIDTH 297
-
+// Γραφικά που χρησιμοποιούνται σε διάφορες οθόνες - αρχεία
 extern float scrolling_back;
 extern Rectangle play_button_bounds;
 extern Rectangle rules_button_bounds;
@@ -30,7 +34,9 @@ extern Texture asteroids;
 extern Texture bullet_left;
 extern Texture life;
 extern Texture star;
+// Γραμματοσειρά
 extern Font font;
+// 'Ηχοι
 extern Sound collision_sound;
 extern Sound bullet_sound;
 

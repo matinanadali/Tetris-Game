@@ -24,6 +24,8 @@
 #define ASTEROID_MIN_ROTATION_SPEED (-PI/32)
 #define ASTEROID_WIDTH 90
 #define ASTEROID_HEIGHT 90
+
+// Απόκλιση των αστεροειδών που δημιουργούνται μετά την σύγκουση από τον άξονα κρούσης
 #define ASTEROID_MIN_ANGLE_AFTER_COLLISION (PI/8)
 #define ASTEROID_MAX_ANGLE_AFTER_COLLISION (-PI/8)
 
@@ -41,10 +43,6 @@
 typedef enum {
 	SPACESHIP, ASTEROID, BULLET, STAR
 } ObjectType;
-
-typedef enum {
-	IDLE, JUMPING, FALLING, MOVING_UP, MOVING_DOWN
-} VerticalMovement;
 
 typedef enum {
 	WELCOME, TRANSITION, GAME, RULES, GAME_OVER

@@ -22,6 +22,8 @@ extern Rectangle rules_button_bounds;
 extern Rectangle home_button_bounds_in_rules;
 extern Rectangle home_button_bounds_in_game_over;
 extern Rectangle play_again_button_bounds;
+extern Rectangle credits_button_bounds;
+extern Rectangle credits_button_bounds_in_game_over;
 extern Texture spaceship;
 extern Texture bullet;
 extern Texture background;

@@ -1,7 +1,7 @@
 #include "rules_screen.h"
 #define TEXT_HEIGHT 30 // ύψος γραμμής
 // Κείμενο κανόνων
-char *rules_text[10] = {"Welcome to Interstellar Adventure! Your mission is to navigate a spaceship", 
+char *rules_text[10] = {"Welcome to the ultimate Asteroids Game! Your mission is to navigate a spaceship", 
                         "through the vast expanse of space, collecting stars and avoiding asteroids.",
                         "Here are the rules to help you on your journey:\n",
                         "1. Each star you collect increases your score by 1 point.",

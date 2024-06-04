@@ -45,7 +45,7 @@ typedef enum {
 } ObjectType;
 
 typedef enum {
-	WELCOME, TRANSITION, GAME, RULES, GAME_OVER
+	WELCOME, TRANSITION, GAME, RULES, CREDITS, GAME_OVER
 } Screen;
 
 typedef struct asteroid_state {
@@ -108,6 +108,7 @@ typedef struct button_state {
 	bool play;
 	bool rules;
 	bool home;
+	bool credits;
 } *ButtonState;
 
 // Η κατάσταση του παιχνιδιού (handle)

@@ -551,6 +551,8 @@ void state_update(State state, KeyState keys, ButtonState buttons) {
 		state->info.screen_state ->screen = RULES;
 	} else if (buttons->home) {
 		state->info.screen_state->screen = WELCOME;
+	} else if (buttons->credits) {
+		state->info.screen_state->screen = CREDITS;
 	}
 
 	if (state->info.screen_state->screen == TRANSITION) {

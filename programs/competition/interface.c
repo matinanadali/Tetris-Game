@@ -4,15 +4,18 @@
 #include "rules_screen.h"
 #include "transition_screen.h"
 #include "game_over_screen.h"
+#include "credits_screen.h"
 
 const Color bullet_color = (Color){165,58,57,232};
 
 // Θέσεις κουμπιών
 Rectangle play_button_bounds = {40, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
-Rectangle rules_button_bounds = {80 + BUTTON_WIDTH, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
-Rectangle home_button_bounds_in_rules = {MID_WIDTH - (BUTTON_WIDTH / 2), SCREEN_HEIGHT - BUTTON_HEIGHT - 80, BUTTON_WIDTH,  BUTTON_HEIGHT};
-Rectangle home_button_bounds_in_game_over = {MID_WIDTH - (BUTTON_WIDTH / 2), 300, BUTTON_WIDTH,  BUTTON_HEIGHT};
-Rectangle play_again_button_bounds = {MID_WIDTH - PLAY_AGAIN_BUTTON_WIDTH/2, 200, PLAY_AGAIN_BUTTON_WIDTH,  BUTTON_HEIGHT};
+Rectangle rules_button_bounds = {100 + BUTTON_WIDTH, MID_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Rectangle credits_button_bounds = {40, MID_HEIGHT + BUTTON_HEIGHT + 30, BUTTON_WIDTH, BUTTON_HEIGHT};
+Rectangle credits_button_bounds_in_game_over = {MID_WIDTH - BUTTON_WIDTH * 0.5 - 35, 400, BUTTON_WIDTH, BUTTON_HEIGHT};
+Rectangle home_button_bounds_in_rules = {MID_WIDTH - 0.5 * BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT - 80, BUTTON_WIDTH,  BUTTON_HEIGHT};
+Rectangle home_button_bounds_in_game_over = {MID_WIDTH - 0.5 * BUTTON_WIDTH, 300, BUTTON_WIDTH,  BUTTON_HEIGHT};
+Rectangle play_again_button_bounds = {MID_WIDTH - 0.5 * PLAY_AGAIN_BUTTON_WIDTH, 200, PLAY_AGAIN_BUTTON_WIDTH,  BUTTON_HEIGHT};
 // Γραφικά που χρησιμοποιόυνται
 Texture spaceship;
 Texture asteroids;
@@ -41,7 +44,7 @@ void interface_init() {
 
     // Φόρτωση γραφικών
     spaceship = LoadTexture("assets/spaceship.png");
-    // pexels.com Photo by Kai Pilger: https://www.pexels.com/photo/cluster-of-stars-1341279/
+    
     background = LoadTexture("assets/background.png");
     rules_button = LoadTexture("assets/rules_button.png");
     play_button = LoadTexture("assets/play_button.png");
@@ -89,6 +92,8 @@ void interface_draw_frame(State state) {
         draw_transition_screen(state);
     } else if (state_info(state)->screen_state->screen == RULES) {
         draw_rules_screen(state);
+    } else if (state_info(state)->screen_state->screen == CREDITS) {
+        draw_credits_screen(state);
     } else {
         draw_game_over_screen(state);
     }

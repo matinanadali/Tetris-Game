@@ -28,8 +28,12 @@ void update_and_draw() {
         screen == WELCOME && CheckCollisionPointRec(mousePoint, rules_button_bounds) && 
         IsMouseButtonDown(MOUSE_LEFT_BUTTON),
         // Μετάβαση στην οθόνη HOME
-        ((screen == RULES && CheckCollisionPointRec(mousePoint, home_button_bounds_in_rules)) ||
+        (((screen == RULES || screen == CREDITS) && CheckCollisionPointRec(mousePoint, home_button_bounds_in_rules)) ||
          (screen == GAME_OVER && CheckCollisionPointRec(mousePoint, home_button_bounds_in_game_over))) &&
+        IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+        // Μετάβαση στην οθόνη CREDITS
+        ((screen == WELCOME && CheckCollisionPointRec(mousePoint, credits_button_bounds)) ||
+         (screen == GAME_OVER && CheckCollisionPointRec(mousePoint, credits_button_bounds_in_game_over))) &&
         IsMouseButtonDown(MOUSE_LEFT_BUTTON)
     };
 

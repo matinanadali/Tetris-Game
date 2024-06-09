@@ -17,7 +17,7 @@ char *credits_text[11] = {"Created By:",
 void draw_credits_screen(State state) {
     // Σχεδίαση κινούμενου background
     scrolling_back += 0.2f;
-    if (scrolling_back >= 2*SCREEN_HEIGHT) scrolling_back = 0;
+    if (scrolling_back >= SCREEN_HEIGHT) scrolling_back = 0;
     DrawTextureEx(background, (Vector2){ 0, scrolling_back }, 0.0f, 2.0f, (Color){255,255,255, 70});
     DrawTextureEx(background, (Vector2){ 0, -SCREEN_HEIGHT + scrolling_back}, 0.0f, 2.0f, (Color){255,255,255, 70});
 

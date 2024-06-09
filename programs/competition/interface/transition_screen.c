@@ -22,7 +22,7 @@ static void DrawArc(int centerX, int centerY, float radius, float startAngle, fl
 void draw_counter_section(State state) {
     // Σχεδιάζουμε το background
     scrolling_back += (state_info(state)->screen_state->frames_in_transition > 180) ? 5.0f : 0.2f;
-    if (scrolling_back >= 2*SCREEN_HEIGHT) scrolling_back = 0;
+    if (scrolling_back >= SCREEN_HEIGHT) scrolling_back = 0;
     DrawTextureEx(background, (Vector2){ 0, scrolling_back }, 0.0f, 2.0f, (Color){255,255,255, 70});
     DrawTextureEx(background, (Vector2){ 0, -SCREEN_HEIGHT + scrolling_back}, 0.0f, 2.0f, (Color){255,255,255, 70});
 

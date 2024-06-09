@@ -6,6 +6,8 @@
 #include "game_over_screen.h"
 #include "credits_screen.h"
 
+float scrolling_back = 0.0f;
+
 const Color bullet_color = (Color){165,58,57,232};
 
 // Θέσεις κουμπιών

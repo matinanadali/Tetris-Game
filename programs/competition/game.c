@@ -20,7 +20,7 @@ void update_and_draw() {
     Vector2 mousePoint = GetMousePosition();
     Screen screen = state_info(state)->screen_state->screen;
     struct button_state buttons = (struct button_state){
-        // Μετάβαση στην οθόνη PLAY
+        // Μετάβαση στην οθόνη GAME
         ((screen == WELCOME && CheckCollisionPointRec(mousePoint, play_button_bounds)) ||
          (screen == GAME_OVER && CheckCollisionPointRec(mousePoint, play_again_button_bounds))) && 
          IsMouseButtonDown(MOUSE_LEFT_BUTTON),

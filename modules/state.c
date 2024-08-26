@@ -1,397 +1,450 @@
-
-#include <stdlib.h>
-#include "ADTVector.h"
-#include "ADTList.h"
 #include "state.h"
-#include "vec2.h"
-#include "math.h"
-#include <stdio.h>
+bool block_grids[][4][4][4] = {
+	{	// type 0
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{1, 0, 0, 0},
+			{1, 1, 1, 1},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 1, 1, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{1, 1, 1, 1},
+			{0, 0, 0, 1},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 0, 1, 0},
+			{0, 0, 1, 0},
+			{0, 0, 1, 0},
+			{0, 1, 1, 0}
+		}
+	},
+		{	// type 1
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{1, 1, 0, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 0, 0, 0},
+			{0, 0, 1, 0},
+			{0, 1, 1, 0},
+			{0, 1, 0, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{1, 1, 0, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 0, 0, 0},
+			{0, 0, 1, 0},
+			{0, 1, 1, 0},
+			{0, 1, 0, 0}
+		}
+	},
+		{	// type 2
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{0, 1, 0, 0},
+			{1, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 0, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 0, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{1, 1, 1, 0},
+			{0, 1, 0, 0}
+		},
+		{	// rotation 3
+			{0, 0, 0, 0},
+			{0, 1, 0, 0},
+			{1, 1, 0, 0},
+			{0, 1, 0, 0}
+		}
+	},
+		{	// type 3
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 0, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 0, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		}
+	},
+	{	// type 4
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{0, 0, 1, 1},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 0, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 1, 0},
+			{0, 0, 1, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{0, 0, 1, 1},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 0, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 1, 0},
+			{0, 0, 1, 0}
+		}
+	},
+	{	// type 5
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{1, 1, 1, 1},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{1, 1, 1, 1},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0}
+		}
+	},
+	{	// type 6
+		{	// rotation 0
+			{0, 0, 0, 0},
+			{0, 0, 0, 1},
+			{1, 1, 1, 1},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 1
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 0, 0},
+			{0, 1, 1, 0}
+		},
+		{	// rotation 2
+			{0, 0, 0, 0},
+			{1, 1, 1, 1},
+			{1, 0, 0, 0},
+			{0, 0, 0, 0}
+		},
+		{	// rotation 3
+			{0, 1, 1, 0},
+			{0, 0, 1, 0},
+			{0, 0, 1, 0},
+			{0, 0, 1, 0}
+		}
+	}
 
-static void add_asteroids(State state, int num);
-
-///// Βοηθητικές συναρτήσεις ////////////////////////////////////////
-
-// Επιστρέφει έναν τυχαίο πραγματικό αριθμό στο διάστημα [min,max]
-static double randf(double min, double max) {
-	return min + (double)rand() / RAND_MAX * (max - min);
-}
-
-// Aφαιρεί το στοιχείο στη pos του vector
-void vector_remove_at(Vector vector, int pos) {
-	Pointer last_value = vector_get_at(vector, vector_size(vector)-1);
-	Pointer value_to_remove = vector_get_at(vector, pos);
-	
-	// Ανταλλαγή στοιχείου προς διαγραφή με το τελευταίο στοιχείο του vector
-	vector_set_at(vector, pos, last_value);
-	vector_set_at(vector, vector_size(vector)-1, value_to_remove);
-
-	// Διαγραφή τελευταίου στοιχείου
-	vector_remove_last(vector);
-}
-
-// Eλέγχει αν το σημείο στη θέση position είναι εντός του ορθογωνίου που ορίζουν 
-// τα σημεία top_left και bottom_right
-bool is_inside_rectangle(Vector2 position, Vector2 top_left, Vector2 bottom_right) {
-	return position.x >= top_left.x && 
-		   position.x <= bottom_right.x &&
-		   position.y <= top_left.y &&
-		   position.y >= bottom_right.y;
-}
-
-// Ελέγχει αν τα αντικέιμενα a και b (θεωρούνται σφαιρικά κέντρου object->position και ακτίνας object->size) συγκρούονται
-bool collide(Object a, Object b) {
-	return CheckCollisionCircles(a->position, a->size, b->position, b->size);
-}
-
-////////////////////////////////////////////////////////////////////
-
-
-// Οι ολοκληρωμένες πληροφορίες της κατάστασης του παιχνιδιού.
-// Ο τύπος State είναι pointer σε αυτό το struct, αλλά το ίδιο το struct
-// δεν είναι ορατό στον χρήστη.
-
-struct state {
-	Vector objects;			// περιέχει στοιχεία Object (αστεροειδείς, σφαίρες)
-	struct state_info info;	// Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
-	int next_bullet;		// Αριθμός frames μέχρι να επιτραπεί ξανά σφαίρα
-	float speed_factor;		// Πολλαπλασιαστής ταχύτητς (1 = κανονική ταχύτητα, 2 = διπλάσια, κλπ)
 };
 
-// Δημιουργεί και επιστρέφει ένα αντικείμενο
-static Object create_object(ObjectType type, Vector2 position, Vector2 speed, Vector2 orientation, double size) {
-	Object obj = malloc(sizeof(*obj));
-	obj->type = type;
-	obj->position = position;
-	obj->speed = speed;
-	obj->orientation = orientation;
-	obj->size = size;
-	return obj;
+int max_sx[7] = {COLS-4, COLS-3, COLS-3, COLS-3, COLS-4, COLS-4,COLS-4};
+
+Color colors[5] = {RED, GREEN, BLUE, YELLOW, VIOLET};
+
+bool in_grid(int x) {
+	return 0 <= x && x < COLS;
 }
 
-// Δημιουργεί και επιστρέφει την αρχική κατάσταση του παιχνιδιού
+
+// Generates a random integer between lower and upper (inclusive)
+int irand(int lower, int upper) {
+    return (rand() % (upper - lower + 1)) + lower;
+}
+
+// Updates the block grid based on its type and orientation
+void update_block_grid(Block block) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            block->grid[i][j] = block_grids[block->type][block->orientation][i][j];
+        }
+    }
+}
+
+// Creates and returns a new block
+Block block_create() {
+    Block block = malloc(sizeof(struct block));
+	block->type = irand(0, 6);
+	block->position.x = irand(0, max_sx[block->type]);
+	block->position.y = -3;
+	block->orientation = 0;
+	block->color = colors[irand(0, 4)];
+	update_block_grid(block);
+	return block;
+}
+
+// Created and returns initial state info
+struct state_info state_info_create() {
+    struct state_info info;
+	info.paused = false;
+	info.score = 0;
+	info.game_over = false;
+	info.moving_block = NULL;
+	return info;
+}
+
+// Creates and returns initial state
 State state_create() {
-	// Δημιουργία του state
-	State state = malloc(sizeof(*state));
-
-	// Γενικές πληροφορίες
-	state->info.paused = false;				// Το παιχνίδι ξεκινάει χωρίς να είναι paused.
-	state->speed_factor = 1;				// Κανονική ταχύτητα
-	state->next_bullet = 0;					// Σφαίρα επιτρέπεται αμέσως
-	state->info.score = 0;				// Αρχικό σκορ 0
-
-	// Δημιουργούμε το vector των αντικειμένων, και προσθέτουμε αντικείμενα
-	state->objects = vector_create(0, NULL);
-
-	// Δημιουργούμε το διαστημόπλοιο
-	state->info.spaceship = create_object(
-		SPACESHIP,
-		(Vector2){0, 0},			// αρχική θέση στην αρχή των αξόνων
-		(Vector2){0, 0},			// μηδενική αρχική ταχύτητα
-		(Vector2){0, 1},			// κοιτάει προς τα πάνω
-		SPACESHIP_SIZE				// μέγεθος
-	);
-
-	// Προσθήκη αρχικών αστεροειδών
-	add_asteroids(state, ASTEROID_NUM);
-
+    State state = malloc(sizeof(*state));
+	state->blocks = vector_create(0, NULL);
+	state->info = state_info_create();
+	state->speed_factor = 1;
+	for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			state->occupied_cells[i][j] = EMPTY;
+		}
+	}
 	return state;
 }
 
-// Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
+// Returns basic game information
 StateInfo state_info(State state) {
-	return &state->info;
+    return &state->info;
 }
 
-// Επιστρέφει μια λίστα με όλα τα αντικείμενα του παιχνιδιού στην κατάσταση state,
-// των οποίων η θέση position βρίσκεται εντός του παραλληλογράμμου με πάνω αριστερή
-// γωνία top_left και κάτω δεξιά bottom_right.
-List state_objects(State state, Vector2 top_left, Vector2 bottom_right) {
-	List object_list = list_create(NULL);
-	
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		Object current_object = vector_get_at(state->objects, i);
-		if (is_inside_rectangle(current_object->position, top_left, bottom_right)) {
-			list_insert_next(object_list, list_last(object_list), current_object);
+// Returns the vector of blocks
+Vector state_blocks(State state) {
+    return state->blocks;
+}
+
+
+bool valid_movement(Block block, int movement) {
+	// Left- and right-most cell of block with current orientation
+	int left_most, right_most;
+	bool found_occupied_col = false;
+
+	for (int col = 0; col < 4; col++) {
+		for (int row = 0; row < 4; row++) {
+			// Find first occupied column form left to right
+			if (block->grid[row][col]) {
+				found_occupied_col = true;
+				left_most = block->position.x + col;
+			}
+		}
+		if (found_occupied_col) break;
+	}
+
+	found_occupied_col = false;
+	for (int col = 3; col >= 0; col--) {
+		for (int row = 0; row < 4; row++) {
+			// Find first occupied column from right to left
+			if (block->grid[row][col]) {
+				found_occupied_col = true;
+				right_most = block->position.x + col;
+			}
+		}
+		if (found_occupied_col) break;
+	}
+
+	// Check if the whole block is inside the grid when movement is applied
+	return in_grid(left_most + movement) && in_grid(right_most + movement);
+}
+
+void merge_block_grid(State state, Block block) {
+	for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			if (state->occupied_cells[i][j] == MOVING)
+				state->occupied_cells[i][j] = EMPTY;
 		}
 	}
-
-	return object_list;
-}
-
-// Προσθέτει num αστεροειδείς στην πίστα (η οποία μπορεί να περιέχει ήδη αντικείμενα).
-//
-// ΠΡΟΣΟΧΗ: όλα τα αντικείμενα έχουν συντεταγμένες x,y σε ένα καρτεσιανό επίπεδο.
-// - Η αρχή των αξόνων είναι η θέση του διαστημόπλοιου στην αρχή του παιχνιδιού
-// - Στο άξονα x οι συντεταγμένες μεγαλώνουν προς τα δεξιά.
-// - Στον άξονα y οι συντεταγμένες μεγαλώνουν προς τα πάνω.
-static void add_asteroids(State state, int num) {
-	for (int i = 0; i < num; i++) {
-		// Τυχαία θέση σε απόσταση [ASTEROID_MIN_DIST, ASTEROID_MAX_DIST]
-		// από το διστημόπλοιο.
-		//
-		Vector2 position = vec2_add(
-			state->info.spaceship->position,
-			vec2_from_polar(
-				randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),	// απόσταση
-				randf(0, 2*PI)									// κατεύθυνση
-			)
-		);
-
-		// Τυχαία ταχύτητα στο διάστημα [ASTEROID_MIN_SPEED, ASTEROID_MAX_SPEED]
-		// με τυχαία κατεύθυνση.
-		//
-		Vector2 speed = vec2_from_polar(
-			randf(ASTEROID_MIN_SPEED, ASTEROID_MAX_SPEED) * state->speed_factor,
-			randf(0, 2*PI)
-		);
-
-		Object asteroid = create_object(
-			ASTEROID,
-			position,
-			speed,
-			(Vector2){0, 0},								// δεν χρησιμοποιείται για αστεροειδείς
-			randf(ASTEROID_MIN_SIZE, ASTEROID_MAX_SIZE)		// τυχαίο μέγεθος
-		);
-		vector_insert_last(state->objects, asteroid);
-	}
-}
-
-// Βοηθητική συνάρτηση για τη handle_collisions:
-// Δημιουγεί έναν νέο αστεροειδή με συγκεκριμένη ταχύτητα και μέγεθος σε τυχαία απόσταση από το διαστημόπλοιο
-Object create_new_asteroid(int size, int speed_value, Vector2 spaceship_position) {
-	// Η ταχύτητα έχει ορισμένο μέτρο και τυχαία κατεύθυνση
-	Vector2 speed = vec2_from_polar(
-		speed_value,
-		randf(0, 2*PI)
-	);
-
-	Vector2 position = vec2_add(
-		spaceship_position,
-		vec2_from_polar(
-			randf(ASTEROID_MIN_DIST, ASTEROID_MAX_DIST),
-			randf(0, 2*PI)									
-		)
-	);
-
-	Object new_asteroid = create_object(
-		ASTEROID,
-		position,
-		speed,
-		(Vector2){0,0},
-		size
-	);
-
-	return new_asteroid;
-}
-
-
-// Προσθέτει μία σφαίρα, μόνο αν έχουν περάσει τουλάχιστον BULLET_DELAY frames από την προηγούμενη
-void add_bullet(State state) {
-	if (state->next_bullet > 0) return;
-	Object spaceship = state->info.spaceship;
 	
-	// Η σφαίρα έχει σχετική ταχύτητα BULLET_SPEED ως προς το διαστημόπλοιο
-	Vector2 speed = vec2_add(spaceship->speed, vec2_scale(spaceship->orientation, BULLET_SPEED));
-	// Η σφαίρα αρχικά βρίσκεται στη θέση του διαστημοπλοίου
-	Vector2 position = spaceship->position;
-
-	vector_insert_last(state->objects, create_object(BULLET, position, speed, (Vector2){0, 0}, BULLET_SIZE));
-
-	state->next_bullet = BULLET_DELAY;
-}
-
-// Μεταβάλλει το σκορ του state κατά points πόντους
-// Αν το τελικό σκορ προκύψει αρνητικό, μηδενίζεται
-void score_update(State state, int points) {
-	state->info.score += points;
-	if (state->info.score < 0) {
-		state->info.score = 0;
-	}
-}
-
-// Ενημερώνει την κατάσταση του διαστημοπλοίου
-void spaceship_update(Object spaceship, KeyState keys, State state) {
-	// Μετατόπιση διαστημοπλοίου
-	spaceship->position = vec2_add(spaceship->position, vec2_scale(spaceship->speed, state->speed_factor));
-
-	if (keys->up) {  // Eπιτάχυνση διαστημοπλοίου
-		Vector2 acceleration = vec2_scale(spaceship->orientation, SPACESHIP_ACCELERATION);
-		spaceship->speed = vec2_add(spaceship->speed, acceleration);
-	} else {        // Eπιβράδυνση διαστημοπλοίου
-		Vector2 initial_speed = state->info.spaceship->speed;
-		Vector2 slowdown = vec2_scale(spaceship->orientation, -SPACESHIP_SLOWDOWN);
-		spaceship->speed = vec2_add(spaceship->speed, slowdown);
-
-		// Η επιβράδυνση του διαστημοπλοίου μειώνει το μέτρο της ταχύτητας αλλά δεν πρέπει να αλλάζει την κατεύθυνσή της
-		// Αν η νέα ταχύτητα δεν έχει την ίδια κατεύθυνση με την αρχική, μηδενίζεται
-		if (!(initial_speed.x * spaceship->speed.x > 0 || initial_speed.y * spaceship->speed.y > 0)) {
-			spaceship->speed = (Vector2){0,0};
+	int srow = block->position.y;
+	int scol = block->position.x;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (block->grid[i][j]) 
+				if(srow + i >= 0)
+				state->occupied_cells[srow + i][scol + j] = MOVING;
 		}
 	}
-
-	// Περιστροφή διαστημοπλοίου
-	if (keys->left || keys->right) {
-		double rotation_angle = (keys->left ? +1 : -1) * SPACESHIP_ROTATION;
-		spaceship->orientation = vec2_rotate(spaceship->orientation, rotation_angle);
-	}
 }
 
-// Ενημερώνει την κατάσταση του αντικειμένου (αστεροειδούς-σφαίρας) object
-void object_update(Object object, int speed_factor) {
-	// Μετατόπιση αντικειμένου
-	object->position = vec2_add(object->position, vec2_scale(object->speed, speed_factor));
+// Moves the block based on the key input
+void move_block(State state, Block block, KeyState keys) {
+    if (block == NULL) {
+        return;
+    }
+
+    // Vertical movement
+    block->position.y += 1;
+
+	// Horizontal movement
+	int movement = (keys->left ? -1 : (keys->right ? +1 : 0));
+	if (valid_movement(block, movement)) {
+		block->position.x += movement;
+	}
+
+	// Rotation
+	if (keys->up) {
+		block->orientation = (block->orientation + 1) % 4;
+		update_block_grid(block);
+	}
+
+	merge_block_grid(state, block);
 }
 
-// Προσθέτει αστεροειδείς ώστε να υπάρχουν τουλάχιστον ASTEROID_NUM κοντά στο διαστημόπλοιο
-void num_asteroids_update(State state) {
-	int asteroids_near_spaceship = 0;
-	
-	// Συντεταγμένες διαστημοπλοίου
-	double sx = state->info.spaceship->position.x;
-	double sy = state->info.spaceship->position.y;
-	// Λίστα αντικειμένων στο τετράγωνο με κέντρο το διαστημόπλοιο και πλευρά 2 ASTEROID_MAX_DIST 
-	List objects_near_spaceship = state_objects(state, (Vector2){sx - ASTEROID_MAX_DIST, sy + ASTEROID_MAX_DIST},
-												 	   (Vector2){sx + ASTEROID_MAX_DIST, sy - ASTEROID_MAX_DIST});
-	
-	for (ListNode node = list_first(objects_near_spaceship); node != LIST_EOF; node = list_next(objects_near_spaceship, node)) {
-		asteroids_near_spaceship++;
-	}
-	
-	list_destroy(objects_near_spaceship);
-
-	// Για κάθε αστεροειδή που δημιουργείται, το σκορ αυξάνεται κατά 1
-	if (ASTEROID_NUM - asteroids_near_spaceship > 0) {
-		score_update(state, ASTEROID_NUM - asteroids_near_spaceship);
-	}
-	add_asteroids(state, ASTEROID_NUM - asteroids_near_spaceship);
-}
-
-// Διαχειρίζεται τις συγκρούσεις αστεροειδούς - σφαίρας
-void handle_bullet_asteroid_collision(State state, Object asteroid, int pos) {
-	double initial_size = asteroid->size;
-	double initial_speed = vec2_distance((Vector2){0,0}, asteroid->speed);
-	// Για κάθε τέτοια σύγκρουση, το σκορ μειώνεται κατά 10
-	score_update(state, -10);
-
-	// Διαγραφή αρχικού αστεροειδή
-	vector_remove_at(state->objects, pos);
-	free(asteroid);
-
-	// Αν το μέγεθος του αρχικού αστεροειδούς ήταν αρκετά μεγάλο, 
-	// δημιουργούνται 2 νέοι με το μισό μέγεθος και ταχύτητα μέτρου 1.5 φορές μεγαλύτερη του αρχικού
-	if (initial_size >= 2*ASTEROID_MIN_SIZE) {
-		for (int i = 0; i < 2; i++) {
-			vector_insert_last(state->objects, create_new_asteroid(initial_size / 2, initial_speed * 1.5, state->info.spaceship->position));
+// Checks if the moving block is landing
+bool is_landing(State state) {
+    for (int i = 0; i < ROWS-1; i++) {
+		for (int j = 0; j < COLS; j++) {
+			// Moving block lands on an occupied block below it
+			if (state->occupied_cells[i][j] == MOVING && state->occupied_cells[i+1][j] == OCCUPIED) {
+				return true;
+			}
 		}
-		// Για κάθε νέο αστεροιειδή το σκορ αυξάνεται κατά 1
-		score_update(state, 2);
 	}
+	for (int j = 0; j < COLS; j++) {
+		// Moving block at the bottom of the grid
+		if (state->occupied_cells[ROWS-1][j] == MOVING) {
+			return true;
+		}
+	}
+	return false;
 }
 
-// Διαχειρίζεται τη σύγκρουση αστεροειδή - διαστημοπλοίου
-void handle_asteroid_spaceship_collision(State state, Object asteroid, int pos) {
-	// Ο αστεροειδής διαγράφεται
-	vector_remove_at(state->objects, pos);
-	free(asteroid);
-
-	// Το σκορ υποδιπλασιάζεται
-	score_update(state, -state->info.score/2);
+int* create_int(int value) {
+	int *a = malloc(sizeof(int));
+	*a = value;
+	return a;
 }
 
-// Εντοπίζει τις συγκρούσεις αστεροειδή-διαστημοπλοίου και αστεροειδή-σφαίρας
-void handle_collisions(State state) {
-
-	// Εντοπισμός συγκρούσεων αστεροειδή-σφαίρας
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		if (((Object)vector_get_at(state->objects, i))->type != ASTEROID) continue;
-
-		Object asteroid = vector_get_at(state->objects, i);
-		bool destroyed  = false;
-		
-		for (int j = 0; j < vector_size(state->objects); j++) {
-			if (((Object)vector_get_at(state->objects, j))->type != BULLET) continue;	
-			Object bullet = vector_get_at(state->objects, j);
-
-			if (collide(asteroid, bullet)) {
-				handle_bullet_asteroid_collision(state, asteroid, i);
-				// Αν ο αστεροειδής καταστραφεί, δεν μπορεί να συγκρουστεί ξανά με κάποιο αντικείμενο
-				destroyed = true;
-				i--;	// Για να μην προσπεράσουμε το στοιχείο που μεταφέρθηκε στη θέση i από τη vector_remove_at
+Vector get_covered_rows(State state) {
+	Vector covered_rows = vector_create(0, free);
+	for (int i = 0; i < ROWS; i++) {
+		bool covered = true;
+		for (int j = 0; j < COLS; j++) {
+			if (state->occupied_cells[i][j] != OCCUPIED) {
+				covered = false;
 				break;
 			}
-
 		}
-
-		// Εντοπισμός συγκρούσεων αστεροειδή-διαστημοπλοίου
-		if (!destroyed && collide(asteroid, state->info.spaceship)) {
-			handle_asteroid_spaceship_collision(state, asteroid, i);
-			i--;
-		}		
+		if (covered) vector_insert_last(covered_rows, create_int(i));
 	}
+	return covered_rows;
+}
+// Handles the landing of a block
+void handle_landing(State state) {
+	// Change block state from moving to occupied
+    for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			if (state->occupied_cells[i][j] == MOVING) {
+				state->occupied_cells[i][j] = OCCUPIED;
+				state->cell_colors[i][j] = state->info.moving_block->color;
+			}
+		}
+	}
+
+	// Check if occupied blocks are covering at least one whole row
+	Vector covered_rows = get_covered_rows(state);
+	while (vector_size(covered_rows) != 0) {
+		for (int i = 0; i < vector_size(covered_rows); i++) {
+			for (int j = 0; j < COLS; j++) {
+				// Destroy line
+				state->occupied_cells[*(int*)vector_get_at(covered_rows, i)][j] = EMPTY;
+			}
+		}
+		// Occupied cells above the destroyed line are falling down
+		int last_covered_row = *(int*)vector_get_at(covered_rows, vector_size(covered_rows)-1);
+		for (int i = last_covered_row-1; i >= 0; i--) {
+			for (int j = 0; j < COLS; j++) {
+				if (state->occupied_cells[i][j] == OCCUPIED && state->occupied_cells[i+1][j] == EMPTY) {
+					state->occupied_cells[i][j] = EMPTY;
+					state->occupied_cells[i+1][j] = OCCUPIED;
+					state->cell_colors[i+1][j] = state->cell_colors[i][j];
+				}
+			}
+		}
+		vector_destroy(covered_rows);
+		covered_rows = get_covered_rows(state);
+	}
+	vector_destroy(covered_rows);
+	state->info.moving_block = NULL;
 }
 
-// Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
-// Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
+void create_moving_block(State state) {
+	Block new_block = block_create();
+	state->info.moving_block = new_block;
+	vector_insert_last(state->blocks, new_block);
+	merge_block_grid(state, new_block);
+}
+
+bool game_over(State state) {
+	for (int j = 0; j < COLS; j++) {
+		if (state->occupied_cells[0][j] == OCCUPIED) return true;
+	}
+	return false;
+}
+// Updates game state after each frame
 void state_update(State state, KeyState keys) {
-	// Αλλαγή κατάστασης του παιχνιδιού (paused - not paused)
-	if (keys->p) {
-		state->info.paused = !state->info.paused;
+	// Check for game over
+   if (game_over(state)) {
+		state->info.game_over = true;
+   }
+   if (state->info.game_over == true) return;
+	// Check for landing
+	if (is_landing(state)) {
+		handle_landing(state);
 	}
 
-	// Αν το n είναι πατημένο, αφηνούμε το τρέχον frame να εξελιχθεί
-	if (keys->n) {
-		state->info.paused = false;
+	// Create new moving block
+	if (state->info.moving_block == NULL) {
+		create_moving_block(state);	
 	}
 
-	if (state->info.paused) return;
+   // Move block
+   move_block(state, state->info.moving_block, keys);
 
-	// Συγκρούσεις
-	handle_collisions(state);
-
-	// Προσθήκη νέων αστεροειδών
-	num_asteroids_update(state);
-	
-	// Ενημέρωση κατάστασης αντικειμένων
-	double sx = state->info.spaceship->position.x;
-	double sy = state->info.spaceship->position.y;
-	
-	// Λίστα αντικειμένων στο ορθογώνιο με κέντρο το διαστημόπλοιο και πλευρές 4screen_width και 4screen_height
-	List playing_objects = state_objects(state, (Vector2){sx - 2*GetScreenWidth(), sy + 2*GetScreenHeight()}, 
-												(Vector2){sx + 2*GetScreenWidth(), sy - 2*GetScreenHeight()});
-	for (ListNode node = list_first(playing_objects); node != LIST_EOF; node = list_next(playing_objects, node)) {
-		Object current_object = list_node_value(playing_objects, node);
-		object_update(current_object, state->speed_factor);
-	}
-	list_destroy(playing_objects);
-
-	// Ενημέρωση κατάστασης διαστημοπλοίου
-	spaceship_update(state->info.spaceship, keys, state);
-
-	// Προσθήκη νέας σφαίρας
-	if (keys->space) {
-		add_bullet(state);
-	}
-	
-	// Μείωση του αριθμού frames που απαιτούνται για να επιτραπεί η επόμενη σφαίρα
-	state->next_bullet--;
-
-	// Αύξηση της ταχύτητας παιχνιδιού αν το σκορ φτάσει σε κάποιο πολλαπλάσιο του 100
-	if (state->info.score != 0 && state->info.score % 100 == 0) {
-		state->speed_factor *= 1.1;
-	}
-
-	// Αν το n είναι πατημένο, διακόπτουμε την εξέλιξη του παιχνιδιού μετά την εκτέλεση του τρέχοντος frame
-	if (keys->n) {
-		state->info.paused = true;
-	}
 }
 
-// Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη
+
+// Destroys state and frees memory
 void state_destroy(State state) {
-	for (int i = 0; i < vector_size(state->objects); i++) {
-		free(vector_get_at(state->objects, i));
-	}
-	vector_destroy(state->objects);
-	free(state->info.spaceship);
-	free(state);
+
 }

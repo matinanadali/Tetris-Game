@@ -11,11 +11,9 @@ LDFLAGS = -lm
 
 # Αρχεία .o
 OBJS = state.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a
-ALT_OBJS = state_alt.o ./vec2.o $(LIB)/k08.a $(LIB)/libraylib.a ./set_utils.o
 
 # Το εκτελέσιμο πρόγραμμα
 EXEC = state
-ALT_EXEC = state_alt
 
 # Παράμετροι για δοκιμαστική εκτέλεση
 ARGS =
@@ -40,10 +38,6 @@ clean:
 # Εκτέλεση αρχικού προγράμματος
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
-
-# Εκτέλεση εναλλακτικής υλοποίησης
-alt_run: $(ALT_EXEC)
-	./$(ALT_EXEC) $(ARGS)
 
 # Για να φτιάξουμε τα k08.a/libraylib.a τρέχουμε το make στο lib directory.
 $(LIB)/%.a:

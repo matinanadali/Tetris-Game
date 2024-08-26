@@ -1,86 +1,109 @@
 #pragma once
 
+#include <stdlib.h>
+#include "ADTVector.h"
+#include "ADTList.h"
+#include "vec2.h"
+#include "math.h"
+#include <stdio.h>
 #include "raylib.h"
 #include "ADTList.h"
+#include "assert.h"
 
-// Χαρακτηριστικά αντικειμένων
-#define ASTEROID_NUM 6
-#define ASTEROID_MIN_SIZE 10
-#define ASTEROID_MAX_SIZE 80
-#define ASTEROID_MIN_SPEED 1
-#define ASTEROID_MAX_SPEED 1.5
-#define ASTEROID_MIN_DIST 300
-#define ASTEROID_MAX_DIST 400
-#define BULLET_SPEED 10
-#define BULLET_SIZE 3
-#define BULLET_DELAY 15
-#define SPACESHIP_SIZE 40
-#define SPACESHIP_ROTATION (PI/32)
-#define SPACESHIP_ACCELERATION 0.1
-#define SPACESHIP_SLOWDOWN 0.98
+// Screen features
+#define SCREEN_WIDTH 900	
+#define SCREEN_HEIGHT 800
 
-#define SCREEN_WIDTH 900	// Πλάτος της οθόνης
-#define SCREEN_HEIGHT 700	// Υψος της οθόνης
+#define VERTICAL_SPEED 10    // pixels/frame
+#define HORIZONTAL_SPEED 5 	
+#define SIZE 40	
+#define COLS 10
+#define ROWS 20
 
-typedef enum {
-	SPACESHIP, ASTEROID, BULLET
-} ObjectType;
+/* Block types
+	1. *
+	   ****
+	
+	2. **
+		**
+	
+	3.  *
+	   ***
 
-typedef enum {
-	IDLE, JUMPING, FALLING, MOVING_UP, MOVING_DOWN
-} VerticalMovement;
+	4. **
+	   **
+	
+	5.  **
+	   **
+	
+	6. ****
 
-// Πληροφορίες για κάθε αντικείμενο
-typedef struct object {
-	ObjectType type;			// Τύπος (Διαστημόπλοιο, Αστεροειδής, Σφαίρα)
-	Vector2 position;			// Θέση
-	Vector2 speed;				// Ταχύτητα (pixels/frame)
-	double size;				// Μέγεθος (pixels)
-	Vector2 orientation;		// Κατεύθυνση (μόνο για διαστημόπλοιο)
-}* Object;
+	7.    *
+	   ****
+*/
 
-// Γενικές πληροφορίες για την κατάσταση του παιχνιδιού
+typedef enum {EMPTY, OCCUPIED, MOVING} Cell;
+
+typedef struct pair {
+	int x;
+	int y;
+ } Pair;
+
+ typedef struct block {
+	int type;					// Type (= shape)
+	Pair position;				// Position of top left corner
+	int orientation;			// 0-3 clockwise 90-degree rotation
+	bool grid[4][4];
+	Color color;
+}* Block;
+
+
+// General game information
 typedef struct state_info {
-	Object spaceship;				// πληροφορίες για τη το διαστημόπλοιο
-	bool paused;					// true αν το παιχνίδι είναι paused
-	int score;						// το τρέχον σκορ
+	Block moving_block;
+	bool paused;
+	bool game_over;					
+	int score;					
 }* StateInfo;
 
-// Πληροφορίες για το ποια πλήκτρα είναι πατημένα
+
+
+// Structure definitions
+struct state {
+    Vector blocks;			
+    struct state_info info;	
+    float speed_factor;		// 1 = regular game speed, 2 = double, etc
+    Cell occupied_cells[ROWS][COLS];
+	Color cell_colors[ROWS][COLS];
+};
+
+
+
+
+// Pressed buttons
 typedef struct key_state {
-	bool up;						// true αν το αντίστοιχο πλήκτρο είναι πατημένο
+	bool up;						// true if button is pressed
 	bool left;
 	bool right;
 	bool enter;
 	bool space;
-	bool n;
-	bool p;
 }* KeyState;
 
-// Η κατάσταση του παιχνιδιού (handle)
+// Game state
 typedef struct state* State;
 
-
-// Δημιουργεί και επιστρέφει την αρχική κατάσταση του παιχνιδιού
-
+// Creates and returns initial state
 State state_create();
 
-// Επιστρέφει τις βασικές πληροφορίες του παιχνιδιού στην κατάσταση state
-
+// Returns basic game information
 StateInfo state_info(State state);
 
-// Επιστρέφει μια λίστα με όλα τα αντικείμενα του παιχνιδιού στην κατάσταση state,
-// των οποίων η θέση position βρίσκεται εντός του παραλληλογράμμου με πάνω αριστερή
-// γωνία top_left και κάτω δεξιά bottom_right.
+// Returns a vector of all the visible blocks of the current state
+Vector state_blocks(State state);
 
-List state_objects(State state, Vector2 top_left, Vector2 bottom_right);
-
-// Ενημερώνει την κατάσταση state του παιχνιδιού μετά την πάροδο 1 frame.
-// Το keys περιέχει τα πλήκτρα τα οποία ήταν πατημένα κατά το frame αυτό.
-
+// Updates game state after each frame
 void state_update(State state, KeyState keys);
 
-// Καταστρέφει την κατάσταση state ελευθερώνοντας τη δεσμευμένη μνήμη.
-
+// Destroys state and frees memory
 void state_destroy(State state);
 

@@ -1,6 +1,11 @@
-#pragma once
-
+#include "raylib.h"
 #include "state.h"
+#include "ADTList.h"
+#include "vec2.h"
+#include <math.h>
+#include <stdio.h>
+
+
 
 // Αρχικοποιεί το interface του παιχνιδιού
 void interface_init();

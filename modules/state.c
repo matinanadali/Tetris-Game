@@ -230,6 +230,13 @@ struct state_info state_info_create() {
 	return info;
 }
 
+struct state_events state_events_create() {
+	struct state_events events;
+	events.row_clear = 0;
+	events.game_over = false;
+	return events;
+}
+
 // Creates and returns initial state
 State state_create() {
     State state = malloc(sizeof(*state));
@@ -241,6 +248,8 @@ State state_create() {
 			state->occupied_cells[i][j] = EMPTY;
 		}
 	}
+	state->next_block = block_create();
+	state->events = state_events_create();
 	return state;
 }
 
@@ -300,8 +309,10 @@ void merge_block_grid(State state, Block block) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			if (block->grid[i][j]) 
-				if(srow + i >= 0)
-				state->occupied_cells[srow + i][scol + j] = MOVING;
+				if(srow + i >= 0) {
+					state->occupied_cells[srow + i][scol + j] = MOVING;
+					state->cell_colors[srow + i][scol + j] = block->color;
+				}
 		}
 	}
 }
@@ -369,6 +380,36 @@ Vector get_covered_rows(State state) {
 	}
 	return covered_rows;
 }
+
+void clear_covered_rows(State state) {
+	// Check if occupied blocks are covering at least one whole row
+	Vector covered_rows = get_covered_rows(state);
+	state->events.row_clear = vector_size(covered_rows);
+	for (int i = 0; i < vector_size(covered_rows); i++) {
+		for (int j = 0; j < COLS; j++) {
+			// Destroy line
+			state->occupied_cells[*(int*)vector_get_at(covered_rows, i)][j] = CLEARED;
+		}
+	}
+	vector_destroy(covered_rows);
+}
+
+void destroy_cleared_rows(State state) {
+	// Occupied cells above the destroyed line are falling down
+	for (int i = ROWS-1; i >= 1; i--) {
+		for (int j = 0; j < COLS; j++) {
+			if (state->occupied_cells[i][j] == CLEARED) {
+				state->occupied_cells[i][j] = EMPTY;
+				if (state->occupied_cells[i-1][j] == OCCUPIED) {
+					state->occupied_cells[i][j] = OCCUPIED;
+					state->cell_colors[i][j] = state->cell_colors[i-1][j];
+				}
+			}
+		}
+	}
+	// Check again for covered rows
+	clear_covered_rows(state);
+}
 // Handles the landing of a block
 void handle_landing(State state) {
 	// Change block state from moving to occupied
@@ -380,39 +421,18 @@ void handle_landing(State state) {
 			}
 		}
 	}
-
-	// Check if occupied blocks are covering at least one whole row
-	Vector covered_rows = get_covered_rows(state);
-	while (vector_size(covered_rows) != 0) {
-		for (int i = 0; i < vector_size(covered_rows); i++) {
-			for (int j = 0; j < COLS; j++) {
-				// Destroy line
-				state->occupied_cells[*(int*)vector_get_at(covered_rows, i)][j] = EMPTY;
-			}
-		}
-		// Occupied cells above the destroyed line are falling down
-		int last_covered_row = *(int*)vector_get_at(covered_rows, vector_size(covered_rows)-1);
-		for (int i = last_covered_row-1; i >= 0; i--) {
-			for (int j = 0; j < COLS; j++) {
-				if (state->occupied_cells[i][j] == OCCUPIED && state->occupied_cells[i+1][j] == EMPTY) {
-					state->occupied_cells[i][j] = EMPTY;
-					state->occupied_cells[i+1][j] = OCCUPIED;
-					state->cell_colors[i+1][j] = state->cell_colors[i][j];
-				}
-			}
-		}
-		vector_destroy(covered_rows);
-		covered_rows = get_covered_rows(state);
-	}
-	vector_destroy(covered_rows);
+	
+	clear_covered_rows(state);
 	state->info.moving_block = NULL;
 }
 
 void create_moving_block(State state) {
+	state->info.moving_block = state->next_block;
+	vector_insert_last(state->blocks, state->info.moving_block);
+	merge_block_grid(state, state->info.moving_block);
+
 	Block new_block = block_create();
-	state->info.moving_block = new_block;
-	vector_insert_last(state->blocks, new_block);
-	merge_block_grid(state, new_block);
+	state->next_block = new_block;
 }
 
 bool game_over(State state) {
@@ -421,13 +441,18 @@ bool game_over(State state) {
 	}
 	return false;
 }
+
 // Updates game state after each frame
 void state_update(State state, KeyState keys) {
+	if (state->events.row_clear != 0) {
+		destroy_cleared_rows(state);
+	}
+	if (state->events.row_clear != 0) return;
 	// Check for game over
-   if (game_over(state)) {
+	if (game_over(state)) {
 		state->info.game_over = true;
-   }
-   if (state->info.game_over == true) return;
+	}
+   	if (state->info.game_over == true) return;
 	// Check for landing
 	if (is_landing(state)) {
 		handle_landing(state);

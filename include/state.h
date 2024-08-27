@@ -42,7 +42,7 @@
 	   ****
 */
 
-typedef enum {EMPTY, OCCUPIED, MOVING} Cell;
+typedef enum {EMPTY, OCCUPIED, MOVING, CLEARED} Cell;
 
 typedef struct pair {
 	int x;
@@ -66,15 +66,21 @@ typedef struct state_info {
 	int score;					
 }* StateInfo;
 
-
+typedef struct state_events {
+	int row_clear;
+	bool game_over;
+}* StateEvents;
 
 // Structure definitions
 struct state {
     Vector blocks;			
     struct state_info info;	
+	struct state_events events;
     float speed_factor;		// 1 = regular game speed, 2 = double, etc
     Cell occupied_cells[ROWS][COLS];
 	Color cell_colors[ROWS][COLS];
+	Block next_block;
+
 };
 
 

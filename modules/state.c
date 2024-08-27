@@ -455,6 +455,8 @@ void handle_landing(State state) {
 	
 	// Check for fully covered rows
 	clear_covered_rows(state);
+
+	free(state->info.moving_block);
 	state->info.moving_block = NULL;
 }
 
@@ -482,7 +484,7 @@ bool game_over(State state) {
 
 // Updates score, based on cleared rows and current level
 void score_update(State state) {
-	state->info.score += rows_cleared_points[state->events.rows_cleared] * state->info.level;
+	state->info.score += rows_cleared_points[state->events.rows_cleared] * (state->info.level + 1);
 }
 
 // Updates game level after every ten row are cleared
@@ -496,6 +498,12 @@ void level_update(State state) {
 
 // Updates game state after each frame
 void state_update(State state, KeyState keys) {
+	if (state->info.game_over && keys->enter) {
+		// Starting a new game
+		state_destroy(state);
+		state = state_create();
+	}
+
 	if (state->frames_to_next_move > 0) {
 		state->frames_to_next_move -= (keys->down ? 15 : 1);
 		return;
@@ -535,5 +543,6 @@ void state_update(State state, KeyState keys) {
 
 // Destroys state and frees memory
 void state_destroy(State state) {
-
+	if (state->info.moving_block != NULL) free(state->info.moving_block);
+	free(state);
 }

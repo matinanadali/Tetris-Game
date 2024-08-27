@@ -14,34 +14,15 @@
 #define SCREEN_WIDTH 900	
 #define SCREEN_HEIGHT 800
 
-#define VERTICAL_SPEED 10    // pixels/frame
-#define HORIZONTAL_SPEED 5 	
-#define SIZE 40	
+#define SIZE 40	// size of the side of each grid cell (pixels)
 #define COLS 10
 #define ROWS 20
 
-/* Block types
-	1. *
-	   ****
-	
-	2. **
-		**
-	
-	3.  *
-	   ***
+extern int frames_per_move[10];
 
-	4. **
-	   **
-	
-	5.  **
-	   **
-	
-	6. ****
+///////////////////////// Structure definitions ///////////////////////
 
-	7.    *
-	   ****
-*/
-
+// Cell states
 typedef enum {EMPTY, OCCUPIED, MOVING, CLEARED} Cell;
 
 typedef struct pair {
@@ -57,55 +38,46 @@ typedef struct pair {
 	Color color;
 }* Block;
 
-
 // General game information
 typedef struct state_info {
 	Block moving_block;
 	bool paused;
 	bool game_over;					
-	int score;					
+	int score;
+	int level;
+	int rows_cleared_to_next_level;
+					
 }* StateInfo;
 
+// Events happened at current state
 typedef struct state_events {
-	int row_clear;
+	int rows_cleared;	// number of rows cleared
 	bool game_over;
 }* StateEvents;
 
-// Structure definitions
-struct state {
-    Vector blocks;			
+typedef struct state {
     struct state_info info;	
 	struct state_events events;
-    float speed_factor;		// 1 = regular game speed, 2 = double, etc
     Cell occupied_cells[ROWS][COLS];
 	Color cell_colors[ROWS][COLS];
 	Block next_block;
-
-};
-
-
-
+	int frames_to_next_move;	
+}* State;
 
 // Pressed buttons
 typedef struct key_state {
 	bool up;						// true if button is pressed
 	bool left;
 	bool right;
+	bool down;
 	bool enter;
 	bool space;
 }* KeyState;
 
-// Game state
-typedef struct state* State;
+//////////////////////// Function declaration //////////////////////////////////////////////
 
 // Creates and returns initial state
 State state_create();
-
-// Returns basic game information
-StateInfo state_info(State state);
-
-// Returns a vector of all the visible blocks of the current state
-Vector state_blocks(State state);
 
 // Updates game state after each frame
 void state_update(State state, KeyState keys);

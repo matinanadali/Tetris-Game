@@ -11,19 +11,12 @@
 #include "vec2.h"
 #define INF 9999999999999L
 
-///// Βοηθητικές συναρτήσεις ////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////
-
-
 void test_state_create() {
 
 	State state = state_create();
 	TEST_ASSERT(state != NULL);
 
-	StateInfo info = state_info(state);
+	StateInfo info = state->;
 	TEST_ASSERT(info != NULL);
 
 	TEST_ASSERT(!info->paused);
@@ -36,21 +29,18 @@ void test_state_create() {
 
 void test_reaction_to_pressed_keys() {
 	State state = state_create();
-	TEST_ASSERT(state != NULL && state_info(state) != NULL);
+	TEST_ASSERT(state != NULL && state-> != NULL);
 	struct key_state keys = { false, false, false, false, false };
 	// Update state to generate a moving block
 	state_update(state, &keys);
 
-	TEST_ASSERT(vector_size(state_blocks(state)) == 1);
-
-	int block_x = state_info(state)->moving_block->position.x;
-	int block_y = state_info(state)->moving_block->position.y;
-
+	int block_x = state->moving_block->position.x;
+	int block_y = state->moving_block->position.y;
 
 	// Without any pressed keys, moving block only moves vertically
 	state_update(state, &keys);
-	int block_new_x = state_info(state)->moving_block->position.x;
-	int block_new_y = state_info(state)->moving_block->position.y;
+	int block_new_x = state->moving_block->position.x;
+	int block_new_y = state->moving_block->position.y;
 	TEST_ASSERT( block_new_x == block_x );
 	TEST_ASSERT( block_new_y == block_y + 1 );
 

@@ -287,7 +287,7 @@ State state_create() {
 //////////////////// Movement-related functions //////////////////////////
 
 // Checks if the given "block" can move horizontally by "movement" cells (left if negative, right if positive).
-bool valid_movement(Block block, int movement) {
+bool valid_movement(State state, Block block, int movement) {
 	// Left- and right-most cell of block with current orientation
 	int left_most, right_most;
 	
@@ -315,8 +315,11 @@ bool valid_movement(Block block, int movement) {
 		if (found_occupied_col) break;
 	}
 
-	// Check if the whole block is inside the grid when movement is applied
-	return in_grid(left_most + movement) && in_grid(right_most + movement);
+	return in_grid(left_most + movement) &&
+		   in_grid(right_most + movement) &&	// Check if the whole block is inside the grid when movement is applied
+		   state->occupied_cells[block->position.y][left_most + movement] != OCCUPIED &&
+		   state->occupied_cells[block->position.y][right_most + movement] != OCCUPIED;	// Check if cell is occupied
+	
 }
 
 // Merges the moving block into the game grid by marking the cells covered by the block as MOVING.
@@ -354,7 +357,7 @@ void move_block(State state, Block block, KeyState keys) {
 
 	// Horizontal movement
 	int movement = (keys->left ? -1 : (keys->right ? +1 : 0));
-	if (valid_movement(block, movement)) {
+	if (valid_movement(state, block, movement)) {
 		block->position.x += movement;
 	}
 
@@ -437,8 +440,7 @@ void destroy_cleared_rows(State state) {
 			}
 		}
 	}
-	// Check again for covered rows
-	clear_covered_rows(state);
+	state->events.rows_cleared = 0;
 }
 
 // Handles the landing of a block
@@ -493,6 +495,7 @@ void level_update(State state) {
 	// Maximum level = 9
 	if (state->info.rows_cleared_to_next_level <= 0 && state->info.level < 9) {
 		state->info.level += 1;
+		state->info.rows_cleared_to_next_level += 10;
 	}
 }
 

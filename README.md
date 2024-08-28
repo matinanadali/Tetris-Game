@@ -13,7 +13,7 @@ To compile and run the game locally on your PC, you'll need to have the followin
   ```
 **Note**: The game is only tested on Linux operating systems.
 
-Or, you can run the game online using this [link](https://www.google.com).
+Or, you can run the game online using this [link](https://66cf0ef2b0001c4b4bc600db--classictetrisgame.netlify.app/).
 
 ### How to Play
   * Move left/right: Left/Right arrow key

@@ -51,7 +51,7 @@ $(WASM_EXEC): $(WASM_OBJS) $(WASM_LIBS)
 
 # Clean up object files and executables
 clean:
-	rm -f $(OBJS) $(WASM_OBJS) $(EXEC) $(WASM_EXEC) $(WASM_LIBS)
+	rm -f $(OBJS) $(WASM_OBJS) $(EXEC) $(WASM_EXEC)
 
 run: $(EXEC)
 	./$(EXEC) $(ARGS)

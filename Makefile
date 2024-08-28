@@ -9,7 +9,7 @@ CC = gcc
 EMCC = emcc
 
 # Compile options
-CFLAGS = -Wall -Werror -g $(INCLUDE)
+CFLAGS = -Wall -Werror $(INCLUDE)
 LDFLAGS = -lm
 
 # Object files for native build

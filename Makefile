@@ -1,44 +1,37 @@
-# Το Makefile αυτό βρίσκεται στο root ολόκληρου του project και χρησιμεύει για
-# να κάνουμε εύκολα compile πολλά τμήματα του project μαζί. Το Makefile αυτό
-# καλεί το make στα διάφορα directories ως
-#   $(MAKE) -C <dir> <target>
-# το οποίο είναι ισοδύναμο με το να τρέξουμε make <target> μέσα στο directory <foo>
+# paths
+LIB = lib
+INCLUDE = -I /include ../include
+MODULES = ./modules
+PROGRAMS = ./programs
 
-# Ολα τα directories μέσα στο programs directory
-PROGRAMS = $(subst programs/, , $(wildcard programs/*))
+# compiler
+CC = gcc
 
-# Compile: όλα, προγράμματα, tests
-all: programs tests
+# Compile options
+CFLAGS = -Wall -Werror -g $(INCLUDE)
+LDFLAGS = -lm
 
-# Η παρακάτω γραμμή δημιουργεί ένα target programs-<foo> για οποιοδήποτε <foo>. Η μεταβλητή $* περιέχει το "foo"
-programs-%:
-	$(MAKE) -C programs/$*
+# Αρχεία .o
+OBJS = $(PROGRAMS)/game.o $(MODULES)/state.o $(PROGRAMS)/interface.o \
+					$(MODULES)/vec2.o \
+					$(LIB)/k08.a \
+					$(LIB)/libraylib.a \
 
-programs: $(addprefix programs-, $(PROGRAMS))		# depend στο programs-<foo> για κάθε στοιχείο του PROGRAMS
+EXEC = game
 
-tests:
-	$(MAKE) -C tests all
+include $(LIB)/libraylib.mk
 
-# Εκτέλεση: όλα, προγράμματα, tests
-run: run-tests run-programs
+all: $(EXEC) $(ALT_EXEC)
 
-run-programs-%:
-	$(MAKE) -C programs/$* run
+$(EXEC): $(OBJS)
+	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
 
-run-programs: $(addprefix run-programs-, $(PROGRAMS))
+# Clean up object files and executables
+clean:
+	rm -f $(OBJS) $(ALT_OBJS) $(EXEC) $(ALT_EXEC)
 
-run-tests:
-	$(MAKE) -C tests run
+run: $(EXEC)
+	./$(EXEC) $(ARGS)
 
-# Εκκαθάριση
-clean-programs-%:
-	$(MAKE) -C programs/$* clean
-
-clean: $(addprefix clean-programs-, $(PROGRAMS))
-	$(MAKE) -C tests clean
-	$(MAKE) -C lib clean
-
-# Δηλώνουμε ότι οι παρακάτω κανόνες είναι εικονικοί, δεν παράγουν αρχεία. Θέλουμε δηλαδή
-# το "make programs" να εκτελεστεί παρόλο που υπάρχει ήδη ένα directory "programs".
-#
-.PHONY: programs tests lib run run-programs run-tests clean
+$(LIB)/%.a:
+	$(MAKE) -C $(LIB) $*.a

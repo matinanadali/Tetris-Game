@@ -495,7 +495,7 @@ void level_update(State state) {
 	// Maximum level = 9
 	if (state->info.rows_cleared_to_next_level <= 0 && state->info.level < 9) {
 		state->info.level += 1;
-		state->info.rows_cleared_to_next_level += 10;
+		state->info.rows_cleared_to_next_level = 10;
 	}
 }
 

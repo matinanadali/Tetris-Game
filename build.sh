@@ -10,3 +10,5 @@ echo "Installing and activating Emscripten SDK..."
 ./emsdk install latest
 ./emsdk activate latest
 source emsdk_env.sh
+
+make wasm

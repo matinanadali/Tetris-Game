@@ -1,25 +1,38 @@
-# Makefile για τις βιβλιοθήκες k08.a και libraylib.a
+# Compiler
+CC = gcc
+EMCC = emcc
 
-# Βρίσκουμε ποιο λειτουργικό σύστημα χρησιμοποιείται
-ifdef WASM
-	SUFFIX = wasm
-else ifeq ($(OS),Windows_NT)
-	SUFFIX = win
-else ifeq ($(shell uname -s),Linux)
-	SUFFIX = linux
-else
-	SUFFIX = macos
-endif
+# Compile options
+CFLAGS = -Wall -Werror -g
+INCLUDE = -I../include
 
-all: k08.a libraylib.a
+# Object files for native build
+OBJS = ADTVector.o
 
-# "Παράγουμε" το k08.a απλά αντιγράφοντας το αρχείο που αντιστοιχεί στο λειτουργικό σύστημα που χρησιμοποιούμε
-k08.a:
-	cp k08_$(SUFFIX).a k08.a
+# Object files for WebAssembly build
+WASM_OBJS = ADTVector_wasm.o
 
-# Το ίδιο για το libraylib.a
-libraylib.a:
-	cp libraylib_$(SUFFIX).a libraylib.a
+# Targets
+all: k08.a
 
+wasm: k08_wasm.a
+
+# Native build for k08.a
+k08.a: $(OBJS)
+	ar rcs $@ $(OBJS)
+
+# WebAssembly build for k08_wasm.a
+k08_wasm.a: $(WASM_OBJS)
+	$(EMCC) $(WASM_OBJS) -o $@ -r
+
+# Compile .o files for native build
+%.o: %.c
+	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
+
+# Compile .o files for WebAssembly build
+%_wasm.o: %.c
+	$(EMCC) -c $(CFLAGS) $(INCLUDE) $< -o $@
+
+# Clean up object files and libraries
 clean:
-	$(RM) k08.a libraylib.a
+	rm -f $(OBJS) $(WASM_OBJS) 

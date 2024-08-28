@@ -1,3 +1,5 @@
-[build]
-  command = ""
-  publish = "/"
+[[redirects]]
+  from = "/*"
+  to = "/game.html"
+  status = 200
+
